@@ -99,6 +99,89 @@ public abstract class DKIMCommon {
         updateSignature(signature, relaxedHeaders, "dkim-signature", signatureStub);
     }
 
+    /**
+     * ARC-Message-Signature signature check.
+     * Similar to DKIM signature check but uses ARC-Message-Signature header name.
+     */
+    protected static void arcMessageSignatureCheck(Headers h, SignatureRecord sign,
+                                                   List<CharSequence> headers, Signature signature)
+            throws SignatureException, PermFailException {
+        
+        boolean relaxedHeaders = SignatureRecord.RELAXED.equals(sign.getHeaderCanonicalisationMethod());
+        if (!relaxedHeaders
+                && !SignatureRecord.SIMPLE.equals(sign.getHeaderCanonicalisationMethod())) {
+            throw new PermFailException("Unsupported canonicalization algorythm: "
+                    + sign.getHeaderCanonicalisationMethod());
+        }
+        
+        Map<String, Integer> processedHeader = new HashMap<>();
+        
+        for (CharSequence header : headers) {
+            List<String> hl = h.getFields(header.toString());
+            if (hl != null && !hl.isEmpty()) {
+                String lowerCaseHeader = header.toString().toLowerCase(Locale.US);
+                Integer done = processedHeader.get(lowerCaseHeader);
+                if (done == null)
+                    done = 0;
+                int doneHeaders = done + 1;
+                if (doneHeaders <= hl.size()) {
+                    String fv = hl.get(hl.size() - doneHeaders);
+                    updateSignature(signature, relaxedHeaders, header, fv);
+                    signature.update("\r\n".getBytes());
+                    processedHeader.put(lowerCaseHeader, doneHeaders);
+                }
+            }
+        }
+        
+        String signatureStub = "ARC-Message-Signature:" + sign.toUnsignedString();
+        updateSignature(signature, relaxedHeaders, "arc-message-signature", signatureStub);
+    }
+    
+    /**
+     * ARC-Seal signature check.
+     * Signs all ARC headers (ARC-Authentication-Results, ARC-Message-Signature,
+     * and all previous ARC-Seal headers) for a given instance.
+     */
+    protected static void arcSealCheck(Headers h, int instance,
+                                       List<String> arcAuthResultsHeaders,
+                                       List<String> arcMessageSignatureHeaders,
+                                       List<String> arcSealHeaders,
+                                       String arcSealUnsignedString,
+                                       Signature signature)
+            throws SignatureException, PermFailException {
+        
+        // ARC-Seal always uses relaxed canonicalization
+        boolean relaxedHeaders = true;
+        
+        // Sign all ARC-Authentication-Results headers for this instance
+        for (String aarHeader : arcAuthResultsHeaders) {
+            if (aarHeader != null) {
+                updateSignature(signature, relaxedHeaders, "arc-authentication-results", aarHeader);
+                signature.update("\r\n".getBytes());
+            }
+        }
+        
+        // Sign all ARC-Message-Signature headers for this instance
+        for (String amsHeader : arcMessageSignatureHeaders) {
+            if (amsHeader != null) {
+                updateSignature(signature, relaxedHeaders, "arc-message-signature", amsHeader);
+                signature.update("\r\n".getBytes());
+            }
+        }
+        
+        // Sign all previous ARC-Seal headers (instances 1 to instance-1)
+        for (String asHeader : arcSealHeaders) {
+            if (asHeader != null) {
+                updateSignature(signature, relaxedHeaders, "arc-seal", asHeader);
+                signature.update("\r\n".getBytes());
+            }
+        }
+        
+        // Sign the current ARC-Seal (unsigned)
+        String signatureStub = "ARC-Seal:" + arcSealUnsignedString;
+        updateSignature(signature, relaxedHeaders, "arc-seal", signatureStub);
+    }
+
     public static void streamCopy(InputStream bodyIs, OutputStream out)
             throws IOException {
         byte[] buffer = new byte[2048];
