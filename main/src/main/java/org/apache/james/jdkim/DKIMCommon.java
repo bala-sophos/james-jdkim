@@ -35,7 +35,7 @@ import java.util.Map;
 
 public abstract class DKIMCommon {
 
-    private static final boolean DEEP_DEBUG = false;
+    private static final boolean DEEP_DEBUG = true;
 
     protected static void updateSignature(Signature signature,
                                           boolean relaxed,
@@ -63,6 +63,14 @@ public abstract class DKIMCommon {
 
     protected static void signatureCheck(Headers h, SignatureRecord sign,
                                          List<CharSequence> headers, Signature signature)
+        throws PermFailException, SignatureException
+    {
+         signatureCheck(h, sign, headers, signature, "Dkim-Signature");
+    }
+
+    protected static void signatureCheck(Headers h, SignatureRecord sign,
+                                         List<CharSequence> headers, Signature signature,
+                                         String signatureHeaderName)
             throws SignatureException, PermFailException {
 
         boolean relaxedHeaders = SignatureRecord.RELAXED.equals(sign.getHeaderCanonicalisationMethod());
@@ -95,8 +103,8 @@ public abstract class DKIMCommon {
             }
         }
 
-        String signatureStub = "DKIM-Signature:" + sign.toUnsignedString();
-        updateSignature(signature, relaxedHeaders, "dkim-signature", signatureStub);
+        String signatureStub = signatureHeaderName + ":" + sign.toUnsignedString();
+        updateSignature(signature, relaxedHeaders, signatureHeaderName.toLowerCase(), signatureStub);
     }
 
     public static void streamCopy(InputStream bodyIs, OutputStream out)

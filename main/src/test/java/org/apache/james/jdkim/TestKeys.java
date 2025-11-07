@@ -27,11 +27,18 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
+import java.util.Objects;
+
 import java.util.Base64;
+
 
 public class TestKeys {
     public static final PrivateKey privateKey = loadPrivateKey("org/apache/james/jdkim/keys/private.key");
@@ -40,6 +47,8 @@ public class TestKeys {
 
     public static final PrivateKey privateKey_2 = loadPrivateKey("org/apache/james/jdkim/keys/private.2.key");
     public static final PublicKey publicKey_2 = loadPublicKey("org/apache/james/jdkim/keys/public.2.pem");
+
+    public static final PrivateKey arc_privatekey_1 = loadPrivateKey("org/apache/james/jdkim/keys/arc_private1.key");
     public static final KeyPair keyPair_2 = new KeyPair(publicKey, privateKey);
 
     // poor man´s pem loaders, I'm too lazy to pull in bouncy castle
@@ -70,7 +79,12 @@ public class TestKeys {
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll(System.lineSeparator(), "");
+
+
+            System.out.println("Key Text: " + keyText);
+
             byte[] encoded = Base64.getMimeDecoder().decode(keyText);
+
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             return keyFactory.generatePrivate(keySpec);
