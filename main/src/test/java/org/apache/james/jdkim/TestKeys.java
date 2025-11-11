@@ -42,6 +42,8 @@ public class TestKeys {
     public static final PublicKey publicKey_2 = loadPublicKey("org/apache/james/jdkim/keys/public.2.pem");
     public static final KeyPair keyPair_2 = new KeyPair(publicKey, privateKey);
 
+     public static final PrivateKey arc_privatekey_1 = loadPrivateKey("org/apache/james/jdkim/keys/arc_private1.key");
+
     // poor man´s pem loaders, I'm too lazy to pull in bouncy castle
     private static PublicKey loadPublicKey(String uri) {
         try {

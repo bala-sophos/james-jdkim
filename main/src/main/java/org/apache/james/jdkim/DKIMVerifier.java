@@ -35,6 +35,7 @@ import org.apache.james.jdkim.exceptions.TempFailException;
 import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.CompoundBodyHasher;
 import org.apache.james.jdkim.impl.Message;
+import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordImpl;
 import org.apache.james.jdkim.tagvalue.PublicKeyRecordImpl;
 import org.apache.james.jdkim.tagvalue.SignatureRecordImpl;
 import org.apache.james.jdkim.tagvalue.SignatureRecordTemplate;
@@ -83,6 +84,15 @@ public class DKIMVerifier {
     }
 
     public SignatureRecord newSignatureRecord(String record) {
+        return newSignatureRecord(record, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }
+
+    public SignatureRecord newSignatureRecord(String record, String signatureHeaderName) {
+
+        if (signatureHeaderName.equalsIgnoreCase(DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER)) {
+            return new ArcMessageSignatureRecordImpl(record);
+        }
+
         return new SignatureRecordImpl(record);
     }
 
@@ -241,8 +251,14 @@ public class DKIMVerifier {
         }
     }
 
-    public BodyHasher newBodyHasher(Headers messageHeaders) throws FailException {
-        List<String> fields = messageHeaders.getFields("DKIM-Signature");
+    public BodyHasher newBodyHasher(Headers messageHeaders)
+        throws FailException
+    {
+        return newBodyHasher(messageHeaders, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }    
+
+    public BodyHasher newBodyHasher(Headers messageHeaders, String signatureHeaderName) throws FailException {
+        List<String> fields = messageHeaders.getFields(signatureHeaderName);
         if (fields == null || fields.isEmpty()) {
             return null;
         }
@@ -259,7 +275,7 @@ public class DKIMVerifier {
                     String v = signatureField.substring(pos + 1);
                     SignatureRecord signatureRecord = null;
                     try {
-                        signatureRecord = newSignatureRecord(v);
+                        signatureRecord = newSignatureRecord(v, signatureHeaderName);
                     } catch (IllegalStateException e) {
                         throw new PermFailException("Invalid signature record: " + e.getMessage(), signatureRecord, e);
                     }
@@ -298,7 +314,7 @@ public class DKIMVerifier {
                     try {
                         byte[] decoded = signatureRecord.getSignature();
                         signatureVerify(messageHeaders, signatureRecord, decoded,
-                                publicKeyRecord, signedHeadersList);
+                                publicKeyRecord, signedHeadersList, signatureHeaderName);
                     } catch (IllegalArgumentException e) {
                         throw new PermFailException("Invalid signature record: " + e.getMessage(), signatureRecord, e);
                     }
@@ -324,7 +340,6 @@ public class DKIMVerifier {
 
         return new CompoundBodyHasher(bodyHashJobs, signatureExceptions);
     }
-
     /**
      * Verifies all of the DKIM-Signature records declared in the Headers
      * object.
@@ -337,8 +352,24 @@ public class DKIMVerifier {
      */
     public List<SignatureRecord> verify(Headers messageHeaders,
                                         InputStream bodyInputStream) throws IOException, FailException {
+        return verify(messageHeaders, bodyInputStream, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }
 
-        BodyHasher bh = newBodyHasher(messageHeaders);
+    /**
+     * Verifies all of the DKIM-Signature records declared in the Headers
+     * object.
+     *
+     * @param messageHeaders  parsed headers
+     * @param bodyInputStream input stream for the body.
+     * @param signatureHeaderName the name of the signature header
+     * @return a list of verified signature records
+     * @throws IOException If error occurs handling data
+     * @throws FailException if no signature can be verified
+     */
+    public List<SignatureRecord> verify(Headers messageHeaders,
+                                        InputStream bodyInputStream, String signatureHeaderName) throws IOException, FailException {
+
+        BodyHasher bh = newBodyHasher(messageHeaders, signatureHeaderName);
 
         if (bh == null) return null;
 
@@ -507,10 +538,11 @@ public class DKIMVerifier {
      * @param decoded the expected signature hash
      * @param key     the DKIM public key record
      * @param headers the list of signed headers
+     * @param signatureHeaderName the name of the signature header
      * @throws PermFailException If signature or public key validation fails
      */
     private void signatureVerify(Headers h, SignatureRecord sign,
-                                 byte[] decoded, PublicKeyRecord key, List<CharSequence> headers)
+                                 byte[] decoded, PublicKeyRecord key, List<CharSequence> headers, String signatureHeaderName)
             throws PermFailException {
         try {
             Signature signature = Signature.getInstance(sign.getHashMethod()
@@ -524,7 +556,7 @@ public class DKIMVerifier {
             }
             signature.initVerify(publicKey);
 
-            signatureCheck(h, sign, headers, signature);
+            signatureCheck(h, sign, headers, signature, signatureHeaderName);
 
             if (!signature.verify(decoded))
                 throw new PermFailException("Header signature does not verify", sign);

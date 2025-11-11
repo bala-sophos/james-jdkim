@@ -60,7 +60,7 @@ public class SignatureRecordImpl extends TagValue implements SignatureRecord {
         super.validate();
         // TODO: what about v=0.5 and no v= at all?
         // do specs allow parsing? what should we check?
-        if (!"1".equals(getValue("v")))
+        if (mandatoryTags.contains("v") && !"1".equals(getValue("v")))
             throw new IllegalStateException(
                     "Invalid DKIM-Signature version (expected '1'): "
                             + getValue("v"));

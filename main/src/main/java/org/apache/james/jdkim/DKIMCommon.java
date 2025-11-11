@@ -1,3 +1,4 @@
+
 /****************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
@@ -35,6 +36,9 @@ import java.util.Map;
 
 public abstract class DKIMCommon {
 
+    public static final String ARC_MESSAGE_SIGNATURE_HEADER = "ARC-Message-Signature";
+    public static final String DKIM_SIGNATURE_HEADER = "DKIM-Signature";
+
     private static final boolean DEEP_DEBUG = false;
 
     protected static void updateSignature(Signature signature,
@@ -60,9 +64,17 @@ public abstract class DKIMCommon {
                 System.out.println("#" + fv + "#");
         }
     }
-
+    
     protected static void signatureCheck(Headers h, SignatureRecord sign,
                                          List<CharSequence> headers, Signature signature)
+            throws SignatureException, PermFailException {
+
+        signatureCheck(h, sign, headers, signature, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }
+
+    protected static void signatureCheck(Headers h, SignatureRecord sign,
+                                         List<CharSequence> headers, Signature signature,
+                                         String signatureHeaderName)
             throws SignatureException, PermFailException {
 
         boolean relaxedHeaders = SignatureRecord.RELAXED.equals(sign.getHeaderCanonicalisationMethod());
@@ -95,8 +107,8 @@ public abstract class DKIMCommon {
             }
         }
 
-        String signatureStub = "DKIM-Signature:" + sign.toUnsignedString();
-        updateSignature(signature, relaxedHeaders, "dkim-signature", signatureStub);
+        String signatureStub = signatureHeaderName + ":" + sign.toUnsignedString();
+        updateSignature(signature, relaxedHeaders, signatureHeaderName, signatureStub);
     }
 
     public static void streamCopy(InputStream bodyIs, OutputStream out)

@@ -28,6 +28,7 @@ import org.apache.james.jdkim.exceptions.FailException;
 import org.apache.james.jdkim.exceptions.PermFailException;
 import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.Message;
+import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordTemplate;
 import org.apache.james.jdkim.tagvalue.SignatureRecordTemplate;
 
 import java.io.IOException;
@@ -54,15 +55,24 @@ public class DKIMSigner {
     }
 
     public SignatureRecord newSignatureRecordTemplate(String record) {
+        return newSignatureRecordTemplate(record, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }
+
+    public SignatureRecord newSignatureRecordTemplate(String record, String signatureHeaderName) {
+        if (signatureHeaderName.equalsIgnoreCase(DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER)) {
+            return new ArcMessageSignatureRecordTemplate(record);
+        }
+
         return new SignatureRecordTemplate(record);
     }
+    
 
     public BodyHasher newBodyHasher(SignatureRecord signRecord)
             throws PermFailException {
         return new BodyHasherImpl(signRecord);
     }
 
-    public String sign(InputStream is) throws IOException, FailException {
+    public String sign(InputStream is, String signatureHeaderName) throws IOException, FailException {
         Message message;
         try {
             try {
@@ -77,7 +87,7 @@ public class DKIMSigner {
             }
 
             try {
-                SignatureRecord srt = newSignatureRecordTemplate(signatureRecordTemplate);
+                SignatureRecord srt = newSignatureRecordTemplate(signatureRecordTemplate, signatureHeaderName);
 
                 BodyHasher bhj = newBodyHasher(srt);
 
@@ -93,9 +103,17 @@ public class DKIMSigner {
         } finally {
             is.close();
         }
+    }    
+
+    public String sign(InputStream is) throws IOException, FailException {
+        return sign(is, DKIMCommon.DKIM_SIGNATURE_HEADER);
     }
 
-    public String sign(Headers message, BodyHasher bh) throws PermFailException {
+    public  String sign(Headers message, BodyHasher bh) throws PermFailException {
+        return sign(message, bh, DKIMCommon.DKIM_SIGNATURE_HEADER);
+    }    
+
+    public String sign(Headers message, BodyHasher bh, String signatureHeaderName) throws PermFailException {
         if (!(bh instanceof BodyHasherImpl)) {
             throw new PermFailException(
                     "Supplied BodyHasher has not been generated with this signer");
@@ -115,11 +133,11 @@ public class DKIMSigner {
             // we need a method to "regenerate the text representation" and to
             // retrieve it when it is valid.
             byte[] signatureHash = signatureSign(message, bhj
-                    .getSignatureRecord(), privateKey, headers);
+                    .getSignatureRecord(), privateKey, headers, signatureHeaderName);
 
             bhj.getSignatureRecord().setSignature(signatureHash);
 
-            return "DKIM-Signature:" + bhj.getSignatureRecord().toString();
+            return signatureHeaderName + bhj.getSignatureRecord().toString();
         } catch (InvalidKeyException e) {
             throw new PermFailException("Invalid key: " + e.getMessage(), bhj.getSignatureRecord(), e);
         } catch (NoSuchAlgorithmException e) {
@@ -132,7 +150,8 @@ public class DKIMSigner {
     }
 
     private byte[] signatureSign(Headers h, SignatureRecord sign,
-                                 PrivateKey key, List<CharSequence> headers)
+                                 PrivateKey key, List<CharSequence> headers,
+                                 String signatureHeaderName)
             throws NoSuchAlgorithmException, InvalidKeyException,
             SignatureException, PermFailException {
 
@@ -141,7 +160,7 @@ public class DKIMSigner {
                 + "with" + sign.getHashKeyType().toString().toUpperCase());
         signature.initSign(key);
 
-        signatureCheck(h, sign, headers, signature);
+        signatureCheck(h, sign, headers, signature, signatureHeaderName);
         return signature.sign();
     }
 
