@@ -40,7 +40,11 @@ public class ArcTest
         throws MimeException, IOException
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
-        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/jdkim/corpus/arc_pass.eml"));
+        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+
+        Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message).getStatus());
+
+        message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass_2.eml"));
 
         Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message).getStatus());
     }
@@ -51,7 +55,7 @@ public class ArcTest
         throws MimeException, IOException
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
-        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/jdkim/corpus/arc_fail.eml"));
+        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_fail.eml"));
 
         Assert.assertEquals(ArcValidationResult.Status.FAIL, validator.validate(message).getStatus());
     }
@@ -61,7 +65,7 @@ public class ArcTest
         throws Exception
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
-        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/jdkim/corpus/arc_pass.eml"));
+        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
 
         ArcValidationResult result = validator.validate(message);
 
@@ -71,7 +75,7 @@ public class ArcTest
 
         ArcSigner signer = new ArcSigner(signatureTemple, TestKeys.arc_privatekey_1);
 
-        String ams = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/jdkim/corpus/arc_pass.eml"));
+        String ams = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
 
         String aar = "ARC-Authentication-Results: i=5; mx.g-suite1.emailblr1.com;"
                      + " dkim=pass header.i=@gmail.com header.s=20230601 header.b=\"QzZwwS/+\";"

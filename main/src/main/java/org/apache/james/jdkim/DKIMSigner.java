@@ -95,7 +95,7 @@ public class DKIMSigner {
                 DKIMCommon.streamCopy(message.getBodyInputStream(), bhj
                         .getOutputStream());
 
-                return sign(message, bhj);
+                return sign(message, bhj, signatureHeaderName);
             } finally {
                 message.dispose();
             }
@@ -137,7 +137,7 @@ public class DKIMSigner {
 
             bhj.getSignatureRecord().setSignature(signatureHash);
 
-            return signatureHeaderName + bhj.getSignatureRecord().toString();
+            return signatureHeaderName + ":" + bhj.getSignatureRecord().toString();
         } catch (InvalidKeyException e) {
             throw new PermFailException("Invalid key: " + e.getMessage(), bhj.getSignatureRecord(), e);
         } catch (NoSuchAlgorithmException e) {
