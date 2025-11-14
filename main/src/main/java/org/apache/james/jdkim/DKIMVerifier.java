@@ -60,7 +60,7 @@ import java.util.Map;
 
 public class DKIMVerifier {
     private final List<Result> result = new ArrayList<>();
-    private final VerifierOptions options;
+    protected final VerifierOptions options;
 
     public DKIMVerifier() {
         this(new VerifierOptions.Builder().build());

@@ -19,12 +19,7 @@
 
 package org.apache.james.jdkim;
 
-import org.apache.james.jdkim.ArcSigner;
-import org.apache.james.jdkim.ArcVerifier;
-import org.apache.james.jdkim.TestKeys;
 import org.apache.james.jdkim.api.ArcValidationResult;
-import org.apache.james.jdkim.api.BodyHasher;
-import org.apache.james.jdkim.api.SignatureRecord;
 import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
@@ -33,12 +28,11 @@ import org.apache.james.mime4j.MimeException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.HashMap;
-
-import java.io.IOException;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,11 +74,12 @@ public class ArcTest
 
         int instance = result.getInstanceCount() + 1;
 
-        String signatureTemple = "i="+instance +"; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
+        String signatureTemplate = "i="+instance +"; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
 
-        ArcSigner signer = new ArcSigner(signatureTemple, TestKeys.arc_privatekey_1);
+        ArcSigner signer = new ArcSigner(TestKeys.arc_privatekey_1);
 
-        String ams = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+        String ams = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"),
+                                 signatureTemplate);
 
         String aar = "ARC-Authentication-Results: i=5; mx.g-suite1.emailblr1.com;"
                      + " dkim=pass header.i=@gmail.com header.s=20230601 header.b=\"QzZwwS/+\";"
@@ -112,13 +107,14 @@ public class ArcTest
 
     @Test
     public void testBothSigningMethodsProduceSameSignature() throws Exception {
-        String signatureTemple = "i=5; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
-        ArcSigner signer = new ArcSigner(signatureTemple, TestKeys.arc_privatekey_1);
-        String ams1 = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+        String signatureTemplate = "i=5; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
+        ArcSigner signer = new ArcSigner(TestKeys.arc_privatekey_1);
+        String ams1 = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"),
+                                  signatureTemplate);
 
-        SignatureRecord signatureRecord = new ArcMessageSignatureRecordTemplate(signatureTemple);
+        ArcMessageSignatureRecordTemplate signatureRecord = new ArcMessageSignatureRecordTemplate(signatureTemplate);
 
-        BodyHasher bodyHasher =  new BodyHasherImpl(signatureRecord);
+        BodyHasherImpl bodyHasher =  new BodyHasherImpl(signatureRecord);
 
         Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
 
@@ -131,7 +127,7 @@ public class ArcTest
             }
         }
 
-        String ams2 = signer.sign(message, bodyHasher);
+        String ams2 = signer.sign(message, signatureTemplate, bodyHasher.getDigest());
 
         // Verify both signatures are identical
         assertThat(ams1)

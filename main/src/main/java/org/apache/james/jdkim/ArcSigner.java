@@ -23,10 +23,13 @@ package org.apache.james.jdkim;
 import org.apache.james.jdkim.api.ArcValidationResult;
 import org.apache.james.jdkim.api.BodyHasher;
 import org.apache.james.jdkim.api.Headers;
+import org.apache.james.jdkim.api.SignatureRecord;
 import org.apache.james.jdkim.exceptions.FailException;
 import org.apache.james.jdkim.exceptions.PermFailException;
+import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
+import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordTemplate;
 import org.apache.james.jdkim.tagvalue.ArcSealSignatureRecordImpl;
 import org.apache.james.jdkim.tagvalue.ArcSealSignatureRecordTemplate;
 import org.apache.james.mime4j.MimeException;
@@ -40,6 +43,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.james.jdkim.DKIMCommon.updateSignature;
@@ -48,83 +52,138 @@ public class ArcSigner
 {
     Logger log = LoggerFactory.getLogger(ArcSigner.class);
 
-
-    private final DKIMSigner dkimSigner;
-
     private final PrivateKey privateKey;
-    public ArcSigner(String signatureRecordTemplate, PrivateKey privateKey)
+    public ArcSigner(PrivateKey privateKey)
     {
-        dkimSigner = new DKIMSigner(signatureRecordTemplate, privateKey);
         this.privateKey = privateKey;
     }
 
-    public String sign(InputStream is)
+    public String sign(InputStream is,
+                       String arcMessageSignatureRecordTemplate)
         throws IOException, FailException
     {
 
-        String signatureHeaderName = DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER;
-
-        return dkimSigner.sign(is, signatureHeaderName);
-
+        try
+        {
+            Message message = new Message(is);
+            SignatureRecord signatureRecord = new ArcMessageSignatureRecordTemplate(arcMessageSignatureRecordTemplate);
+            BodyHasher bodyHasher =  new BodyHasherImpl(signatureRecord);
+            DKIMCommon.streamCopy(message.getBodyInputStream(), bodyHasher.getOutputStream());
+            BodyHasherImpl bhj = (BodyHasherImpl) bodyHasher;
+            signatureRecord.setBodyHash(bhj.getDigest());
+            return sign(message, signatureRecord);
+        }
+        catch(MimeException e)
+        {
+            throw new PermFailException("MIME parsing exception: "
+                                        + e.getMessage(), e);
+        }
     }
-
-    public String sign(Headers message, BodyHasher bh)
+    public String sign(Headers headers,
+                       String arcMessageSignatureRecordTemplate,
+                       byte[] bodyHash)
         throws PermFailException
     {
-        String signatureHeaderName = DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER;
-        return dkimSigner.sign(message, bh, signatureHeaderName);
+        SignatureRecord signatureRecord = new ArcMessageSignatureRecordTemplate(arcMessageSignatureRecordTemplate);
+        signatureRecord.setBodyHash(bodyHash);
+        return sign(headers, signatureRecord);
     }
-
-    public String seal(String ams, String aar, String sealTemplate,
-                       Map<Integer, Map<String, String>> instances)
-        throws NoSuchAlgorithmException, InvalidKeyException, SignatureException
+    private String sign(Headers headers,
+                       SignatureRecord signatureRecord)
+        throws PermFailException
     {
-        ArcSealSignatureRecordTemplate tvl = new ArcSealSignatureRecordTemplate(sealTemplate);
-        Signature signature = Signature.getInstance(tvl.getHashMethod()
-                                                       .toString().toUpperCase()
-                                                    + "with" + tvl.getHashKeyType().toString().toUpperCase());
 
-        signature.initSign(privateKey);
+        List<CharSequence> headersToIncludeInSignature = signatureRecord.getHeaders();
 
-        for (int i = 1; i <= instances.size(); i++)
+        try
         {
-            Map<String, String> instanceHeaders = instances.get(i);
-            if (instanceHeaders.containsKey("arc-authentication-results")) {
-                String fv = "arc-authentication-results" + ":" + instanceHeaders.get("arc-authentication-results");
-                updateSignature(signature, true, "arc-authentication-results",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
+            Signature signature = Signature.getInstance(signatureRecord.getHashMethod()
+                                                                                         .toString().toUpperCase()
+                                                        + "with" + signatureRecord.getHashKeyType().toString().toUpperCase());
+            signature.initSign(privateKey);
 
-            if (instanceHeaders.containsKey("arc-message-signature")) {
+            DKIMCommon.signatureCheck(headers, signatureRecord,
+                                     headersToIncludeInSignature, signature,
+                                     DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER);
 
-                String fv = "arc-message-signature" + ":" + instanceHeaders.get("arc-message-signature");
-                updateSignature(signature, true, "arc-message-signature",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
-
-            // Include ARC-Seal for previous instances, but not the current one being verified
-            if (instanceHeaders.containsKey("arc-seal")) {
-                String fv = "arc-seal"+ ":" + instanceHeaders.get("arc-seal");
-                updateSignature(signature, true, "arc-seal",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
-
-
+            byte[] signatureHash = signature.sign();
+            signatureRecord.setSignature(signatureHash);
+            return DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER + ":" + signatureRecord;
+        }
+        catch (InvalidKeyException e) {
+            throw new PermFailException("Invalid key: " + e.getMessage(), signatureRecord, e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new PermFailException("Unknown algorythm: " + e.getMessage(), signatureRecord,
+                                        e);
+        } catch (SignatureException e) {
+            throw new PermFailException("Signing exception: " + e.getMessage(), signatureRecord,
+                                        e);
         }
 
-        updateSignature(signature, true, "arc-authentication-results", "arc-authentication-results" + ":" + aar);
-        signature.update("\r\n".getBytes());
 
-        updateSignature(signature, true, "arc-message-signature", "arc-message-signature" + ":" + ams);
-        signature.update("\r\n".getBytes());
+    }
+    public String seal(String ams, String aar, String arcSealTempalte,
+                       Map<Integer, Map<String, String>> instances)
+        throws PermFailException
+    {
+        SignatureRecord tvl = new ArcSealSignatureRecordTemplate(arcSealTempalte);
+        try
+        {
+            Signature signature = Signature.getInstance(tvl.getHashMethod()
+                                                           .toString().toUpperCase()
+                                                        + "with" + tvl.getHashKeyType().toString().toUpperCase());
 
-        updateSignature(signature, true, "arc-seal", "arc-seal" + ":" + tvl.toUnsignedString());
-        tvl.setSignature(signature.sign());
+            signature.initSign(privateKey);
 
-        return "Arc-Seal" + ":" + tvl.toString();
+            for (int i = 1; i <= instances.size(); i++)
+            {
+                Map<String, String> instanceHeaders = instances.get(i);
+                if (instanceHeaders.containsKey("arc-authentication-results")) {
+                    String fv = "arc-authentication-results" + ":" + instanceHeaders.get("arc-authentication-results");
+                    updateSignature(signature, true, "arc-authentication-results",
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+
+                if (instanceHeaders.containsKey("arc-message-signature")) {
+
+                    String fv = "arc-message-signature" + ":" + instanceHeaders.get("arc-message-signature");
+                    updateSignature(signature, true, "arc-message-signature",
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+
+                // Include ARC-Seal for previous instances, but not the current one being verified
+                if (instanceHeaders.containsKey("arc-seal")) {
+                    String fv = "arc-seal"+ ":" + instanceHeaders.get("arc-seal");
+                    updateSignature(signature, true, "arc-seal",
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+
+
+            }
+
+            updateSignature(signature, true, "arc-authentication-results", "arc-authentication-results" + ":" + aar);
+            signature.update("\r\n".getBytes());
+
+            updateSignature(signature, true, "arc-message-signature", "arc-message-signature" + ":" + ams);
+            signature.update("\r\n".getBytes());
+
+            updateSignature(signature, true, "arc-seal", "arc-seal" + ":" + tvl.toUnsignedString());
+            tvl.setSignature(signature.sign());
+
+            return DKIMCommon.ARC_SEAL_HEADER + ":" + tvl;
+        }
+        catch (InvalidKeyException e) {
+            throw new PermFailException("Invalid key: " + e.getMessage(), tvl, e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new PermFailException("Unknown algorythm: " + e.getMessage(), tvl,
+                                        e);
+        } catch (SignatureException e) {
+            throw new PermFailException("Signing exception: " + e.getMessage(), tvl,
+                                        e);
+        }
     }
 
 }

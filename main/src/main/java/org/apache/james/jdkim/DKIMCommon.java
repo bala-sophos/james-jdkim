@@ -37,6 +37,7 @@ import java.util.Map;
 public abstract class DKIMCommon {
 
     public static final String ARC_MESSAGE_SIGNATURE_HEADER = "ARC-Message-Signature";
+    public static final String ARC_SEAL_HEADER = "ARC-Seal";
     public static final String DKIM_SIGNATURE_HEADER = "DKIM-Signature";
 
     private static final boolean DEEP_DEBUG = false;
@@ -110,6 +111,8 @@ public abstract class DKIMCommon {
         String signatureStub = signatureHeaderName + ":" + sign.toUnsignedString();
         updateSignature(signature, relaxedHeaders, signatureHeaderName, signatureStub);
     }
+
+
 
     public static void streamCopy(InputStream bodyIs, OutputStream out)
             throws IOException {
