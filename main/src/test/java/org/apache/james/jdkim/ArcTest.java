@@ -23,15 +23,24 @@ import org.apache.james.jdkim.ArcSigner;
 import org.apache.james.jdkim.ArcVerifier;
 import org.apache.james.jdkim.TestKeys;
 import org.apache.james.jdkim.api.ArcValidationResult;
+import org.apache.james.jdkim.api.BodyHasher;
+import org.apache.james.jdkim.api.SignatureRecord;
+import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
+import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordTemplate;
 import org.apache.james.mime4j.MimeException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.HashMap;
 
 import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ArcTest
 {
@@ -99,6 +108,40 @@ public class ArcTest
         boolean sealValid = validator.verifyArcSeal(as.substring(as.indexOf(":")+1),instances, instance);
 
         Assert.assertTrue(sealValid);
+    }
 
+    @Test
+    public void testBothSigningMethodsProduceSameSignature() throws Exception {
+        String signatureTemple = "i=5; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
+        ArcSigner signer = new ArcSigner(signatureTemple, TestKeys.arc_privatekey_1);
+        String ams1 = signer.sign(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+
+        SignatureRecord signatureRecord = new ArcMessageSignatureRecordTemplate(signatureTemple);
+
+        BodyHasher bodyHasher =  new BodyHasherImpl(signatureRecord);
+
+        Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+
+        byte[] buffer = new byte[2048];
+        int read;
+        try (InputStream bodyStream = message.getBodyInputStream();
+             OutputStream hashOutputStream = bodyHasher.getOutputStream()) {
+            while ((read = bodyStream.read(buffer)) > 0) {
+                hashOutputStream.write(buffer, 0, read);
+            }
+        }
+
+        String ams2 = signer.sign(message, bodyHasher);
+
+        // Verify both signatures are identical
+        assertThat(ams1)
+            .as("Both signing methods should produce identical signatures")
+            .isEqualTo(ams2);
+
+        System.out.println("Generated signature using sign(InputStream is):");
+        System.out.println(ams1);
+        System.out.println("\nGenerated signature using sign(Headers message, BodyHasher bh):");
+        System.out.println(ams2);
+        System.out.println("\n✓ Both signatures are identical!");
     }
 }
