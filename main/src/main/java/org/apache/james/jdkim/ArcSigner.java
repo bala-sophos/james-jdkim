@@ -21,7 +21,10 @@
 package org.apache.james.jdkim;
 
 import org.apache.james.jdkim.api.ArcValidationResult;
+import org.apache.james.jdkim.api.BodyHasher;
+import org.apache.james.jdkim.api.Headers;
 import org.apache.james.jdkim.exceptions.FailException;
+import org.apache.james.jdkim.exceptions.PermFailException;
 import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
 import org.apache.james.jdkim.tagvalue.ArcSealSignatureRecordImpl;
@@ -56,13 +59,20 @@ public class ArcSigner
     }
 
     public String sign(InputStream is)
-        throws IOException, FailException, MimeException
+        throws IOException, FailException
     {
 
         String signatureHeaderName = DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER;
 
         return dkimSigner.sign(is, signatureHeaderName);
 
+    }
+
+    public String sign(Headers message, BodyHasher bh)
+        throws PermFailException
+    {
+        String signatureHeaderName = DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER;
+        return dkimSigner.sign(message, bh, signatureHeaderName);
     }
 
     public String seal(String ams, String aar, String sealTemplate,
