@@ -20,9 +20,12 @@
 package org.apache.james.jdkim;
 
 import org.apache.james.jdkim.api.ArcValidationResult;
+import org.apache.james.jdkim.api.SignatureRecord;
+import org.apache.james.jdkim.exceptions.FailException;
 import org.apache.james.jdkim.impl.BodyHasherImpl;
 import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
+import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordImpl;
 import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordTemplate;
 import org.apache.james.mime4j.MimeException;
 import org.junit.Assert;
@@ -40,27 +43,34 @@ public class ArcTest
 {
     @Test
     public void testArcValidationPass()
-        throws MimeException, IOException
+        throws MimeException, IOException, FailException
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
         Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+        Map<Integer, Map<String, String>> instances = validator.groupArcHeadersByInstance(message.getFields());
 
-        Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message).getStatus());
+        Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message,
+                                                                                instances,
+                                                                                getBodyHasher(message, instances)).getStatus());
 
         message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass_2.eml"));
-
-        Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message).getStatus());
+        instances = validator.groupArcHeadersByInstance(message.getFields());
+        Assert.assertEquals(ArcValidationResult.Status.PASS, validator.validate(message,
+                                                                                instances,
+                                                                                getBodyHasher(message, instances)).getStatus());
     }
 
 
     @Test
     public void testArcValidationFail()
-        throws MimeException, IOException
+        throws MimeException, IOException, FailException
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
         Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_fail.eml"));
-
-        Assert.assertEquals(ArcValidationResult.Status.FAIL, validator.validate(message).getStatus());
+        Map<Integer, Map<String, String>> instances = validator.groupArcHeadersByInstance(message.getFields());
+        Assert.assertEquals(ArcValidationResult.Status.FAIL, validator.validate(message,
+                                                                                instances,
+                                                                                getBodyHasher(message, instances)).getStatus());
     }
 
     @Test
@@ -69,8 +79,13 @@ public class ArcTest
     {
         ArcVerifier validator = new ArcVerifier(new DNSPublicKeyRecordRetriever());
         Message message = new Message(ArcTest.class.getResourceAsStream("/org/apache/james/arc/arc_pass.eml"));
+        Map<Integer, Map<String, String>> instances = validator.groupArcHeadersByInstance(message.getFields());
 
-        ArcValidationResult result = validator.validate(message);
+        ArcValidationResult result = validator.validate(message,
+                                                        instances,
+                                                        getBodyHasher(message, instances));
+
+
 
         int instance = result.getInstanceCount() + 1;
 
@@ -94,13 +109,12 @@ public class ArcTest
                                 sealTemplate, result.getAllInstances());
 
 
-        Map<Integer, Map<String, String>> instances = result.getAllInstances();
         instances.put(instance, new HashMap<>());
         instances.get(instance).put("arc-seal", as.substring(as.indexOf(":")+1));
         instances.get(instance).put("arc-message-signature", ams.substring(ams.indexOf(":")+1));
         instances.get(instance).put("arc-authentication-results", aar.substring(aar.indexOf(":")+1));
 
-        boolean sealValid = validator.verifyArcSeal(as.substring(as.indexOf(":")+1),instances, instance);
+        boolean sealValid = validator.verifyArcSeal(as.substring(as.indexOf(":")+1),instances);
 
         Assert.assertTrue(sealValid);
     }
@@ -139,5 +153,24 @@ public class ArcTest
         System.out.println("\nGenerated signature using sign(Headers message, BodyHasher bh):");
         System.out.println(ams2);
         System.out.println("\n✓ Both signatures are identical!");
+    }
+
+    private BodyHasherImpl getBodyHasher(Message message,
+                                 Map<Integer, Map<String, String>> instances) throws IOException, FailException
+    {
+        int instancesCount = instances.size();
+        SignatureRecord signatureRecord =
+            new ArcMessageSignatureRecordImpl(instances.get(instancesCount).get("arc-message-signature"));
+        BodyHasherImpl bodyHasher =  new BodyHasherImpl(signatureRecord);
+        byte[] buffer = new byte[2048];
+        int read;
+        try (InputStream bodyStream = message.getBodyInputStream();
+             OutputStream hashOutputStream = bodyHasher.getOutputStream()) {
+            while ((read = bodyStream.read(buffer)) > 0) {
+                hashOutputStream.write(buffer, 0, read);
+            }
+        }
+
+        return bodyHasher;
     }
 }
