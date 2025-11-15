@@ -58,7 +58,7 @@ public class DKIMSigner {
     }
 
     public BodyHasher newBodyHasher(SignatureRecord signRecord)
-        throws PermFailException {
+            throws PermFailException {
         return new BodyHasherImpl(signRecord);
     }
 
@@ -73,7 +73,7 @@ public class DKIMSigner {
                 // This can only be a MimeException but we don't declare to allow usage of
                 // DKIMSigner without Mime4J dependency.
                 throw new PermFailException("MIME parsing exception: "
-                                            + e1.getMessage(), e1);
+                        + e1.getMessage(), e1);
             }
 
             try {
@@ -83,7 +83,7 @@ public class DKIMSigner {
 
                 // computation of the body hash.
                 DKIMCommon.streamCopy(message.getBodyInputStream(), bhj
-                    .getOutputStream());
+                        .getOutputStream());
 
                 return sign(message, bhj);
             } finally {
@@ -98,7 +98,7 @@ public class DKIMSigner {
     public String sign(Headers message, BodyHasher bh) throws PermFailException {
         if (!(bh instanceof BodyHasherImpl)) {
             throw new PermFailException(
-                "Supplied BodyHasher has not been generated with this signer");
+                    "Supplied BodyHasher has not been generated with this signer");
         }
         BodyHasherImpl bhj = (BodyHasherImpl) bh;
         byte[] computedHash = bhj.getDigest();
@@ -115,7 +115,7 @@ public class DKIMSigner {
             // we need a method to "regenerate the text representation" and to
             // retrieve it when it is valid.
             byte[] signatureHash = signatureSign(message, bhj
-                .getSignatureRecord(), privateKey, headers);
+                    .getSignatureRecord(), privateKey, headers);
 
             bhj.getSignatureRecord().setSignature(signatureHash);
 
@@ -124,21 +124,21 @@ public class DKIMSigner {
             throw new PermFailException("Invalid key: " + e.getMessage(), bhj.getSignatureRecord(), e);
         } catch (NoSuchAlgorithmException e) {
             throw new PermFailException("Unknown algorythm: " + e.getMessage(), bhj.getSignatureRecord(),
-                                        e);
+                    e);
         } catch (SignatureException e) {
             throw new PermFailException("Signing exception: " + e.getMessage(), bhj.getSignatureRecord(),
-                                        e);
+                    e);
         }
     }
 
     private byte[] signatureSign(Headers h, SignatureRecord sign,
                                  PrivateKey key, List<CharSequence> headers)
-        throws NoSuchAlgorithmException, InvalidKeyException,
-               SignatureException, PermFailException {
+            throws NoSuchAlgorithmException, InvalidKeyException,
+            SignatureException, PermFailException {
 
         Signature signature = Signature.getInstance(sign.getHashMethod()
-                                                        .toString().toUpperCase()
-                                                    + "with" + sign.getHashKeyType().toString().toUpperCase());
+                .toString().toUpperCase()
+                + "with" + sign.getHashKeyType().toString().toUpperCase());
         signature.initSign(key);
 
         signatureCheck(h, sign, headers, signature);
@@ -159,7 +159,7 @@ public class DKIMSigner {
      * @throws InvalidKeySpecException  on bad input key
      */
     public static PrivateKey getPrivateKey(String privateKeyPKCS8)
-        throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] encKey = Base64.getMimeDecoder().decode(privateKeyPKCS8.getBytes());
 
         // byte[] encKey = privateKey.getBytes();
