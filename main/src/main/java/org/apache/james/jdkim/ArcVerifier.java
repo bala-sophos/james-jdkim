@@ -42,7 +42,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,6 +50,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.james.jdkim.DKIMCommon.AAR_HEADER_LOWER;
+import static org.apache.james.jdkim.DKIMCommon.AMS_HEADER_LOWER;
+import static org.apache.james.jdkim.DKIMCommon.AS_HEADER_LOWER;
 import static org.apache.james.jdkim.DKIMCommon.signatureCheck;
 import static org.apache.james.jdkim.DKIMCommon.updateSignature;
 
@@ -109,20 +111,20 @@ public class ArcVerifier extends DKIMVerifier
                 Map<String, String> instanceHeaders = instances.get(i);
 
                 // Check required headers
-                if (!instanceHeaders.containsKey("arc-seal") ||
-                    !instanceHeaders.containsKey("arc-message-signature") ||
-                    !instanceHeaders.containsKey("arc-authentication-results")) {
+                if (!instanceHeaders.containsKey(AS_HEADER_LOWER) ||
+                    !instanceHeaders.containsKey(AMS_HEADER_LOWER) ||
+                    !instanceHeaders.containsKey(AAR_HEADER_LOWER)) {
                     return ArcValidationResult.fail("Missing required ARC headers in instance " + i);
                 }
 
 
                 log.debug("ARC instance: {}", i) ;
-                log.debug("ARC-Authentication-Results: {}", instances.get(i).get("arc-authentication-results")) ;
-                log.debug("ARC-Message-Signature: {}", instances.get(i).get("arc-message-signature")) ;
-                log.debug("ARC-Seal: {}", instances.get(i).get("arc-seal")) ;
+                log.debug("ARC-Authentication-Results: {}", instances.get(i).get(AAR_HEADER_LOWER)) ;
+                log.debug("ARC-Message-Signature: {}", instances.get(i).get(AMS_HEADER_LOWER)) ;
+                log.debug("ARC-Seal: {}", instances.get(i).get(AS_HEADER_LOWER)) ;
 
                 // Get the CV value from the current ARC-Seal
-                String arcSeal = instanceHeaders.get("arc-seal");
+                String arcSeal = instanceHeaders.get(AS_HEADER_LOWER);
 
                 // Parse the ARC-Seal header
                 ArcSealSignatureRecordImpl tvl = new ArcSealSignatureRecordImpl(arcSeal);
@@ -139,7 +141,7 @@ public class ArcVerifier extends DKIMVerifier
                 }
 
                 // Verify ARC-Seal for this instance
-                boolean sealValid = verifyArcSeal(instances.get(i).get("arc-seal"), instances);
+                boolean sealValid = verifyArcSeal(instances.get(i).get(AS_HEADER_LOWER), instances);
                 if (!sealValid) {
                     return ArcValidationResult.fail("Invalid ARC-Seal for instance " + i);
                 }
@@ -152,9 +154,9 @@ public class ArcVerifier extends DKIMVerifier
                 }
             }
 
-            String messageSignature = "arc-message-signature" + ":"  +
-                                      instances.get(maxInstance).get("arc-message-signature");
-            //messageSignature = messageSignature.replace("i=4;" , "v=1;");
+            String messageSignature = AMS_HEADER_LOWER + ":"  +
+                                      instances.get(maxInstance).get(AMS_HEADER_LOWER);
+
             log.debug("Signature to verify:" + messageSignature);
 
 
@@ -171,10 +173,120 @@ public class ArcVerifier extends DKIMVerifier
                    ArcValidationResult.pass(instances) :
                    ArcValidationResult.fail("ARC chain validation failed");
         }
-        catch(Exception e)
+        catch(PermFailException | TempFailException e)
         {
-            log.error("Exception during ARC validation", e);
-            return ArcValidationResult.fail("Exception during ARC validation: " + e.getMessage());
+            log.error("Error during ARC validation: {}", e.getMessage(), e);
+            return ArcValidationResult.fail("Error during ARC validation.");
+        }
+    }
+
+    /**
+     * Verifies an ARC-Seal signature
+     */
+    public boolean verifyArcSeal(String arcSeal,
+                                 Map<Integer, Map<String, String>> instances)
+        throws PermFailException, TempFailException
+    {
+
+        // Parse the ARC-Seal header
+        ArcSealSignatureRecordImpl tvl = new ArcSealSignatureRecordImpl(arcSeal);
+        try
+        {
+            int currentInstance = Integer.parseInt(tvl.getInstance().toString());
+            log.debug("Verifying ARC-Seal for instance {}: {}", currentInstance, arcSeal);
+            // Extract essential fields
+            String domain = tvl.getDToken().toString();
+            String selector = tvl.getSelector().toString();
+            int instanceNum = Integer.parseInt(tvl.getInstance().toString());
+
+            // Verify the instance number matches
+            if (instanceNum != currentInstance) {
+                log.info("Instance number mismatch: expected {}, found {}", currentInstance, instanceNum);
+                return false;
+            }
+
+            // Retrieve the public key
+            PublicKeyRecord publicKeyRecord = publicRecordLookup(tvl);
+
+            if (publicKeyRecord == null) {
+                log.info("Public key not found for selector {} and domain {}", selector, domain);
+                return false;
+            }
+
+            // Parse the public key record
+            PublicKey publicKey;
+
+            try {
+                publicKey = publicKeyRecord.getPublicKey();
+            } catch (IllegalStateException e) {
+                log.error("Invalid public key record: {}", e.getMessage());
+                throw new PermFailException("Invalid Public Key: " + e.getMessage(), tvl, e);
+            }
+
+            Signature signature = Signature.getInstance(tvl.getHashMethod()
+                                                           .toString().toUpperCase()
+                                                        + "with" + tvl.getHashKeyType().toString().toUpperCase());
+
+
+            signature.initVerify(publicKey);
+
+
+
+            for (int i = 1; i <= currentInstance; i++)
+            {
+                Map<String, String> instanceHeaders = instances.get(i);
+                if (instanceHeaders.containsKey(AAR_HEADER_LOWER)) {
+                    String fv = AAR_HEADER_LOWER + ":" + instanceHeaders.get(AAR_HEADER_LOWER);
+                    updateSignature(signature, true, AAR_HEADER_LOWER,
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+
+                if (instanceHeaders.containsKey(AMS_HEADER_LOWER)) {
+
+                    String fv = AMS_HEADER_LOWER + ":" + instanceHeaders.get(AMS_HEADER_LOWER);
+                    updateSignature(signature, true, AMS_HEADER_LOWER,
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+
+                // Include ARC-Seal for previous instances, but not the current one being verified
+                if (i != currentInstance && instanceHeaders.containsKey(AS_HEADER_LOWER)) {
+                    String fv = AS_HEADER_LOWER + ":" + instanceHeaders.get(AS_HEADER_LOWER);
+                    updateSignature(signature, true, AS_HEADER_LOWER,
+                                    fv);
+                    signature.update("\r\n".getBytes());
+                }
+            }
+
+            // Add the current ARC-Seal header without the signature (b=) value
+            //String currentArcSeal = instances.get(currentInstance).get("arc-seal");
+            String modifiedSeal = tvl.toUnsignedString();//currentArcSeal.replaceAll("b=[^;]+", "b=");
+            log.debug("Modified ARC-Seal for verification: {}", modifiedSeal);
+            updateSignature(signature, true, AS_HEADER_LOWER, AS_HEADER_LOWER + ":" + modifiedSeal);
+
+            if (!signature.verify(tvl.getSignature()))
+            {
+                log.info("ARC-Seal signature verification failed for instance {}", currentInstance);
+                return false;
+            }
+
+            log.debug("ARC-Seal signature verified for instance {}", currentInstance);
+            return true;
+
+        }
+        catch (InvalidKeyException e)
+        {
+            throw new PermFailException("Invalid key.", tvl, e);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new PermFailException("No such algorithm.", tvl, e);
+        }
+        catch(SignatureException e)
+        {
+            log.error("Error verifying ARC-Seal: {}", e.getMessage(), e);
+            throw new PermFailException(e.getMessage());
         }
     }
 
@@ -230,100 +342,6 @@ public class ArcVerifier extends DKIMVerifier
 
 
 
-    /**
-     * Verifies an ARC-Seal signature
-     */
-    public boolean verifyArcSeal(String arcSeal,
-                                  Map<Integer, Map<String, String>> instances)
-        throws Exception {
-
-
-        // Parse the ARC-Seal header
-        ArcSealSignatureRecordImpl tvl = new ArcSealSignatureRecordImpl(arcSeal);
-        int currentInstance = Integer.parseInt(tvl.getInstance().toString());
-        log.debug("Verifying ARC-Seal for instance {}: {}", currentInstance, arcSeal);
-        // Extract essential fields
-        String domain = tvl.getDToken().toString();
-        String selector = tvl.getSelector().toString();
-        int instanceNum = Integer.parseInt(tvl.getInstance().toString());
-
-        // Verify the instance number matches
-        if (instanceNum != currentInstance) {
-            log.info("Instance number mismatch: expected {}, found {}", currentInstance, instanceNum);
-            return false;
-        }
-
-        // Retrieve the public key
-        PublicKeyRecord publicKeyRecord = publicRecordLookup(tvl);
-
-        if (publicKeyRecord == null) {
-            log.info("Public key not found for selector {} and domain {}", selector, domain);
-            return false;
-        }
-
-        // Parse the public key record
-        PublicKey publicKey;
-
-        try {
-            publicKey = publicKeyRecord.getPublicKey();
-        } catch (IllegalStateException e) {
-            log.error("Invalid public key record: {}", e.getMessage());
-            throw new PermFailException("Invalid Public Key: " + e.getMessage(), tvl, e);
-        }
-
-        Signature signature = Signature.getInstance(tvl.getHashMethod()
-                                                        .toString().toUpperCase()
-                                                    + "with" + tvl.getHashKeyType().toString().toUpperCase());
-
-
-        signature.initVerify(publicKey);
-
-
-
-        for (int i = 1; i <= currentInstance; i++)
-        {
-            Map<String, String> instanceHeaders = instances.get(i);
-            if (instanceHeaders.containsKey("arc-authentication-results")) {
-                String fv = "arc-authentication-results" + ":" + instanceHeaders.get("arc-authentication-results");
-                updateSignature(signature, true, "arc-authentication-results",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
-
-            if (instanceHeaders.containsKey("arc-message-signature")) {
-
-                String fv = "arc-message-signature" + ":" + instanceHeaders.get("arc-message-signature");
-                updateSignature(signature, true, "arc-message-signature",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
-
-            // Include ARC-Seal for previous instances, but not the current one being verified
-            if (i != currentInstance && instanceHeaders.containsKey("arc-seal")) {
-                String fv = "arc-seal"+ ":" + instanceHeaders.get("arc-seal");
-                updateSignature(signature, true, "arc-seal",
-                                fv);
-                signature.update("\r\n".getBytes());
-            }
-        }
-
-        // Add the current ARC-Seal header without the signature (b=) value
-        //String currentArcSeal = instances.get(currentInstance).get("arc-seal");
-        String modifiedSeal = tvl.toUnsignedString();//currentArcSeal.replaceAll("b=[^;]+", "b=");
-        log.debug("Modified ARC-Seal for verification: {}", modifiedSeal);
-        updateSignature(signature, true, "arc-seal", "arc-seal" + ":" + modifiedSeal);
-
-        if (!signature.verify(tvl.getSignature()))
-        {
-            log.info("ARC-Seal signature verification failed for instance {}", currentInstance);
-            return false;
-        }
-
-        log.debug("ARC-Seal signature verified for instance {}", currentInstance);
-        return true;
-
-    }
-
     private boolean verifyArcMessageSignature(Headers headers,
                                               byte[] computedBodyHash,
                                               String arcMessageSignatureToVerify)
@@ -336,8 +354,6 @@ public class ArcVerifier extends DKIMVerifier
         byte[] expectedBodyHash = signatureRecord.getBodyHash();
 
         if (!Arrays.equals(expectedBodyHash, computedBodyHash)) {
-            System.out.println("Expected body hash: " + new String(Base64.getEncoder().encode(expectedBodyHash)));
-            System.out.println("Computed body hash: " + new String(Base64.getEncoder().encode(computedBodyHash)));
             throw new PermFailException(
                 "Computed bodyhash is different from the expected one", signatureRecord);
         }
@@ -398,7 +414,7 @@ public class ArcVerifier extends DKIMVerifier
             }
             signature.initVerify(publicKey);
 
-            signatureCheck(h, sign, headers, signature, DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER);
+            signatureCheck(h, sign, headers, signature, DKIMCommon.AMS_HEADER);
 
             if (!signature.verify(decoded))
                 throw new PermFailException("Header signature does not verify", sign);

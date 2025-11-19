@@ -36,8 +36,14 @@ import java.util.Map;
 
 public abstract class DKIMCommon {
 
-    public static final String ARC_MESSAGE_SIGNATURE_HEADER = "ARC-Message-Signature";
-    public static final String ARC_SEAL_HEADER = "ARC-Seal";
+    public static final String AMS_HEADER       = "ARC-Message-Signature";
+    public static final String AMS_HEADER_LOWER = AMS_HEADER.toLowerCase();
+    public static final String AS_HEADER        = "ARC-Seal";
+    public static final String AS_HEADER_LOWER  = AS_HEADER.toLowerCase();
+
+    public static final String AAR_HEADER       = "ARC-Authentication-Results";
+    public static final String AAR_HEADER_LOWER = AAR_HEADER.toLowerCase();
+
     public static final String DKIM_SIGNATURE_HEADER = "DKIM-Signature";
 
     private static final boolean DEEP_DEBUG = false;
@@ -65,7 +71,7 @@ public abstract class DKIMCommon {
                 System.out.println("#" + fv + "#");
         }
     }
-    
+
     protected static void signatureCheck(Headers h, SignatureRecord sign,
                                          List<CharSequence> headers, Signature signature)
             throws SignatureException, PermFailException {

@@ -20,17 +20,15 @@
 
 package org.apache.james.jdkim;
 
-import org.apache.james.jdkim.api.ArcValidationResult;
 import org.apache.james.jdkim.api.BodyHasher;
 import org.apache.james.jdkim.api.Headers;
 import org.apache.james.jdkim.api.SignatureRecord;
 import org.apache.james.jdkim.exceptions.FailException;
 import org.apache.james.jdkim.exceptions.PermFailException;
+import org.apache.james.jdkim.exceptions.TempFailException;
 import org.apache.james.jdkim.impl.BodyHasherImpl;
-import org.apache.james.jdkim.impl.DNSPublicKeyRecordRetriever;
 import org.apache.james.jdkim.impl.Message;
 import org.apache.james.jdkim.tagvalue.ArcMessageSignatureRecordTemplate;
-import org.apache.james.jdkim.tagvalue.ArcSealSignatureRecordImpl;
 import org.apache.james.jdkim.tagvalue.ArcSealSignatureRecordTemplate;
 import org.apache.james.mime4j.MimeException;
 import org.slf4j.Logger;
@@ -46,6 +44,11 @@ import java.security.SignatureException;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.james.jdkim.DKIMCommon.AAR_HEADER_LOWER;
+import static org.apache.james.jdkim.DKIMCommon.AMS_HEADER;
+import static org.apache.james.jdkim.DKIMCommon.AMS_HEADER_LOWER;
+import static org.apache.james.jdkim.DKIMCommon.AS_HEADER;
+import static org.apache.james.jdkim.DKIMCommon.AS_HEADER_LOWER;
 import static org.apache.james.jdkim.DKIMCommon.updateSignature;
 
 public class ArcSigner
@@ -60,7 +63,7 @@ public class ArcSigner
 
     public String sign(InputStream is,
                        String arcMessageSignatureRecordTemplate)
-        throws IOException, FailException
+        throws  PermFailException, TempFailException
     {
 
         try
@@ -73,10 +76,14 @@ public class ArcSigner
             signatureRecord.setBodyHash(bhj.getDigest());
             return sign(message, signatureRecord);
         }
+        catch (IOException e)
+        {
+            log.error("IO exception during signing", e);
+            throw new TempFailException("Temporary error in processing");
+        }
         catch(MimeException e)
         {
-            throw new PermFailException("MIME parsing exception: "
-                                        + e.getMessage(), e);
+            throw new PermFailException("MIME parsing exception.", e);
         }
     }
     public String sign(Headers headers,
@@ -104,19 +111,19 @@ public class ArcSigner
 
             DKIMCommon.signatureCheck(headers, signatureRecord,
                                      headersToIncludeInSignature, signature,
-                                     DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER);
+                                     DKIMCommon.AMS_HEADER);
 
             byte[] signatureHash = signature.sign();
             signatureRecord.setSignature(signatureHash);
-            return DKIMCommon.ARC_MESSAGE_SIGNATURE_HEADER + ":" + signatureRecord;
+            return DKIMCommon.AMS_HEADER + ":" + signatureRecord;
         }
         catch (InvalidKeyException e) {
-            throw new PermFailException("Invalid key: " + e.getMessage(), signatureRecord, e);
+            throw new PermFailException("Invalid key.", signatureRecord, e);
         } catch (NoSuchAlgorithmException e) {
-            throw new PermFailException("Unknown algorythm: " + e.getMessage(), signatureRecord,
+            throw new PermFailException("Unknown algorithm.", signatureRecord,
                                         e);
         } catch (SignatureException e) {
-            throw new PermFailException("Signing exception: " + e.getMessage(), signatureRecord,
+            throw new PermFailException("Signing error.", signatureRecord,
                                         e);
         }
 
@@ -138,25 +145,25 @@ public class ArcSigner
             for (int i = 1; i <= instances.size(); i++)
             {
                 Map<String, String> instanceHeaders = instances.get(i);
-                if (instanceHeaders.containsKey("arc-authentication-results")) {
-                    String fv = "arc-authentication-results" + ":" + instanceHeaders.get("arc-authentication-results");
-                    updateSignature(signature, true, "arc-authentication-results",
+                if (instanceHeaders.containsKey(AAR_HEADER_LOWER)) {
+                    String fv = AAR_HEADER_LOWER + ":" + instanceHeaders.get(AAR_HEADER_LOWER);
+                    updateSignature(signature, true, AAR_HEADER_LOWER,
                                     fv);
                     signature.update("\r\n".getBytes());
                 }
 
-                if (instanceHeaders.containsKey("arc-message-signature")) {
+                if (instanceHeaders.containsKey(AMS_HEADER_LOWER)) {
 
-                    String fv = "arc-message-signature" + ":" + instanceHeaders.get("arc-message-signature");
-                    updateSignature(signature, true, "arc-message-signature",
+                    String fv = AMS_HEADER_LOWER + ":" + instanceHeaders.get(AMS_HEADER_LOWER);
+                    updateSignature(signature, true, AMS_HEADER_LOWER,
                                     fv);
                     signature.update("\r\n".getBytes());
                 }
 
                 // Include ARC-Seal for previous instances, but not the current one being verified
-                if (instanceHeaders.containsKey("arc-seal")) {
-                    String fv = "arc-seal"+ ":" + instanceHeaders.get("arc-seal");
-                    updateSignature(signature, true, "arc-seal",
+                if (instanceHeaders.containsKey(AS_HEADER_LOWER)) {
+                    String fv = AS_HEADER_LOWER+ ":" + instanceHeaders.get(AS_HEADER_LOWER);
+                    updateSignature(signature, true, AS_HEADER_LOWER,
                                     fv);
                     signature.update("\r\n".getBytes());
                 }
@@ -164,24 +171,25 @@ public class ArcSigner
 
             }
 
-            updateSignature(signature, true, "arc-authentication-results", "arc-authentication-results" + ":" + aar);
+            updateSignature(signature, true, AAR_HEADER_LOWER, AAR_HEADER_LOWER + ":" + aar);
             signature.update("\r\n".getBytes());
 
-            updateSignature(signature, true, "arc-message-signature", "arc-message-signature" + ":" + ams);
+            updateSignature(signature, true, AMS_HEADER_LOWER, AMS_HEADER_LOWER + ":" + ams);
             signature.update("\r\n".getBytes());
 
-            updateSignature(signature, true, "arc-seal", "arc-seal" + ":" + tvl.toUnsignedString());
+            updateSignature(signature, true, AS_HEADER_LOWER, AAR_HEADER_LOWER + ":" +
+                                                              tvl.toUnsignedString());
             tvl.setSignature(signature.sign());
 
-            return DKIMCommon.ARC_SEAL_HEADER + ":" + tvl;
+            return DKIMCommon.AS_HEADER + ":" + tvl;
         }
         catch (InvalidKeyException e) {
-            throw new PermFailException("Invalid key: " + e.getMessage(), tvl, e);
+            throw new PermFailException("Invalid key.", tvl, e);
         } catch (NoSuchAlgorithmException e) {
-            throw new PermFailException("Unknown algorythm: " + e.getMessage(), tvl,
+            throw new PermFailException("Unknown algorithm.", tvl,
                                         e);
         } catch (SignatureException e) {
-            throw new PermFailException("Signing exception: " + e.getMessage(), tvl,
+            throw new PermFailException("Signing error.", tvl,
                                         e);
         }
     }

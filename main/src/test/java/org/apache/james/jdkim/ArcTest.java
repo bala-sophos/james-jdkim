@@ -20,6 +20,7 @@
 package org.apache.james.jdkim;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeUtility;
 import org.apache.james.jdkim.api.ArcValidationResult;
 import org.apache.james.jdkim.api.Headers;
 import org.apache.james.jdkim.api.SignatureRecord;
@@ -271,6 +272,14 @@ public class ArcTest
 
         Assert.assertEquals(ams1, ams2);
         Assert.assertEquals(seal1, seal2);
+
+        String headerValue = ams2.substring(ams2.indexOf(":")+1);
+        String foldedHeader = MimeUtility.fold(23, headerValue);
+        mimeMessage.addHeader("ARC-Message-Signature", foldedHeader);
+
+        mimeMessage.saveChanges();
+
+        mimeMessage.writeTo(System.out);
     }
 
     private BodyHasherImpl getBodyHasher(Message message,
