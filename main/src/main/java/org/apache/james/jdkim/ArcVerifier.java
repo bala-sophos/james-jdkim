@@ -293,7 +293,7 @@ public class ArcVerifier extends DKIMVerifier
     /**
      * Groups ARC headers by instance number
      */
-    public Map<Integer, Map<String, String>> groupArcHeadersByInstance(List<String> headers) {
+    public static Map<Integer, Map<String, String>> groupArcHeadersByInstance(List<String> headers) {
         Map<String, List<String>> arcHeaders = extractArcHeaders(headers);
         Map<Integer, Map<String, String>> instances = new LinkedHashMap<>();
 
@@ -316,7 +316,7 @@ public class ArcVerifier extends DKIMVerifier
     /**
      * Extracts all ARC headers from a message
      */
-    private Map<String, List<String>> extractArcHeaders(List<String> headers) {
+    private static Map<String, List<String>> extractArcHeaders(List<String> headers) {
         Map<String, List<String>> arcHeaders = new HashMap<>();
 
         for (String header : headers) {
@@ -336,7 +336,7 @@ public class ArcVerifier extends DKIMVerifier
     /**
      * Helper method to add a header to the headers map
      */
-    private void addHeader(Map<String, List<String>> headers, String name, String value) {
+    private static void addHeader(Map<String, List<String>> headers, String name, String value) {
         headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
     }
 
