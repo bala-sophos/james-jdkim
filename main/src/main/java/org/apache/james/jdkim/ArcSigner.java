@@ -115,7 +115,7 @@ public class ArcSigner
 
             byte[] signatureHash = signature.sign();
             signatureRecord.setSignature(signatureHash);
-            return DKIMCommon.AMS_HEADER + ":" + signatureRecord;
+            return  signatureRecord.toString();
         }
         catch (InvalidKeyException e) {
             throw new PermFailException("Invalid key.", signatureRecord, e);
@@ -181,7 +181,7 @@ public class ArcSigner
                                                               tvl.toUnsignedString());
             tvl.setSignature(signature.sign());
 
-            return DKIMCommon.AS_HEADER + ":" + tvl;
+            return tvl.toString();
         }
         catch (InvalidKeyException e) {
             throw new PermFailException("Invalid key.", tvl, e);

@@ -1,300 +1,196 @@
-ARC-Message-Signature: a=rsa-sha256; q=dns/txt;
-      b=h8GM1vWCnKfloJaspBj8H0uaaO5idrUTEt0PyQRAArBvC1NH8imcu7G5lRKQqAVpjUcRxAD0/hMSqzcL8hHy7jiK5HGVSHtZZMploh/LNEeIAKhXqxeaVtw2U/584luCJXGndzjjtjxze+SCVKWihn+J0dTMUNchB/vhbkKkD9bVT0TpqkhDVduJEtWnJZhPFherV6BqtsmPM18gyteQguWWqo8x/cCCWvh9dFwDfcYOGTU+FeHrOJj1xSs7A3HJCJdnO0GL2wm53e9FvhpE6qQYf0EgZ16V77eUbRK/DfNe0K/4S4J55iJok7T4kIcc8eTnzQ2LZckEuNLZ699Zcw==;
-      c=relaxed/relaxed; s=sophos100; d=g-suite1.emailblr1.com; bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-      h=date:from:subject; i=5;
-Arc-Seal: a=rsa-sha256;
-  b=JgC9VgKvxrBRKzeo3AYGhY1p5fwbRqtMZ5ocj+q7fWuoGDPbmGDz3aLl3b6/wU6nOusjQYMQQJwOzkQibk393JgOrwudD2SXo87JqEe8gKLOC5VB5zr3W/1lgX1AdXFSGhUNHBB2if/52YPuLkBqE0fdyTICsE7JV+GIxKdAYM+2D5Y7R2TLtadPr6+dynYbvxE+/tmuV9tXczRUUOox2H/Mr8cz0Ciorw0pbJ4E7ZPcfV6pE76yUEe2BC3x201mZ+BNCjFcTxxLC2y1BrBOEzDMIymkOnNhEFVojTZ1syCv3GMOGPAHjHo9AoRJHbq6QkT1Y88p5GqjJ6vhVVZhsQ==;
-  cv=pass; s=sophos100; d=g-suite1.emailblr1.com; i=5;
-ARC-Authentication-Results: i=5; mx.g-suite1.emailblr1.com;
-       dkim=pass header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+";
-       spf=pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;
-Authentication-Results: mx-01-eu-west-1.prod.hydra.sophos.com; spf=pass smtp.mailfrom=info+bncbdo3x4ec2mebbjwrv3cqmgqev3uqc6i@refugeerights.org; dkim=none; dmarc=fail (recordpolicy=none) header.from=gmail.com
-Received-SPF: pass receiver=mx-01-eu-west-1.prod.hydra.sophos.com; client-ip=209.85.208.72; envelope-from=<info+bncbdo3x4ec2mebbjwrv3cqmgqev3uqc6i@refugeerights.org>; helo=mail-ed1-f72.google.com;
-X-Sophos-Processing-Start-Time: 1756080298301
-X-Sophos-Product-Type: Gateway
-X-Sophos-Email-ID: 3823c6ff25d4482db8b3ac9af5ab117c
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-01-eu-west-1.prod.hydra.sophos.com (Postfix) with ESMTPS id 4c99yy1x4HzRhQp
-	for <plist@refugeerights.org>; Mon, 25 Aug 2025 00:04:57 +0000 (UTC)
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-61c757dbebbso48780a12.2
-        for <plist@refugeerights.org>; Sun, 24 Aug 2025 17:04:57 -0700 (PDT)
-ARC-Seal: i=4; a=rsa-sha256; t=1756080297; cv=pass;
+ARC-Seal:  a=rsa-sha256;
+ b=FtzHHt+CXlEY8YCMZxsByEYPPqAAGifr0b73Zsp/VngtObn5R0JRoXpM/Y4qJi1OHbCZkMOVsmh8MG3GyNAkF9sCs88RBn5gWKfikCXyrGpa3e+QzHfg5O8ev8kvKkeIddnIh0VeJGxP+9wmr2Ex5gXxphBai8pwLv61OjHsWD8ICx7lMIzj1sn1DxcOB5CnSKTR04U9To1T295tgU2PGYGaczkdGsR020sTSk1cutskTLlW4GyAQeE1Nmds57yUpGeOdHMHwvAzWPVzspO4UcSSmgZHL8EymuUx6loojI495lWz1H3Q+kD44H7RsKLJb7WKQGOvbTwrxQzkreArbw==;
+ cv=pass; s=sophos100; d=g-suite1.emailblr1.com; i=3;
+ARC-Authentication-Results: i=3; mx.g-suite1.emailblr1.com; dkim=pass
+ header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+"; spf=pass
+ (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41
+ as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;
+ARC-Message-Signature:  a=rsa-sha256; q=dns/txt;
+ b=chYPqemzG38sKY7aIL9/kMvpJFWncOj2KI+LDd6Rwqs4u5GVYeGBPe3+xxmxFJXGJoo+3QYlvcvddpjiRKkhX9BXqW1l7lSbT54l9Qg6HdDHiz8g009hNzcuDWlH6y2tQewflDZJ7uUqeLVPM/xe7BaG8RdhKlbvPDTMwVZ8sZH0qnFKxI1Xj1aWEonNmjfVLPv0R/DIMkZ7WFnVVX1/ECNoIgPVVs72m+/PnTLwnXaobZAQobMulEzXH2rsHUjeprPVWNkRWqf2uea7vkkbkL8UZo3nzMngbo/m/j5lSEiLffBRAJIQf63kA/5qftI6dFi6RbtZI71mYAuAJCpalw==;
+ c=relaxed/relaxed; s=sophos100; d=g-suite1.emailblr1.com;
+ bh=8r15karoMut1kkFIYPyQzHGjIeNdMCHnIscmzWo9o+0=; h=date:from:subject; i=3;
+Delivered-To: user2@g-suite1.emailblr1.com
+Received: by 2002:a05:7022:458e:b0:11b:cdcc:e702 with SMTP id cf14csp285986dlb;
+        Wed, 19 Nov 2025 07:58:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE7yO4j6EyW32BHTRoqpyizhFvTkACNTFq8EEQ/7tF2+6K49iDVtdrCALUnkR4PLDbyyrVK
+X-Received: by 2002:a05:690c:6d09:b0:786:818e:2bd4 with SMTP id 00721157ae682-78929e2a079mr195826037b3.7.1763567890459;
+        Wed, 19 Nov 2025 07:58:10 -0800 (PST)
+ARC-Seal: i=2; a=rsa-sha256; t=1763567890; cv=pass;
         d=google.com; s=arc-20240605;
-        b=QZhchlWTDLnQ8417RxzqfSQ3hM5fn0Ozcj6g4o7Y29KZND8QrhKBYVJixDm90v1ohJ
-         IWjsCCGbGrqqpz0tibfpHwvp6cG+NiQqv68UrPSCa5NUveUy4UovWeiUvxr1EpZgfle+
-         OexUiAt4t3o0xVzieffvIXg6xicjjdEnua3MAWMTuQB9TZuJ2yHc7y0s+gYx9zwrV6A2
-         nfVor2h5NO25N6uD8W8crENS3n6mABwRypwYfFD9aeifgLDYSFlb9WD8x5zXqSWlscQw
-         oh627LgMq3NJ0Yva5FsmUajYibUlz4it8RKsLoBrQmGNObcZxDNNTRlf0X4ZL8bUNJ9K
-         vpUw==
-ARC-Message-Signature: i=4; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=list-unsubscribe:list-archive:list-help:list-post:list-id
-         :mailing-list:precedence:to:subject:message-id:date:from
-         :mime-version:sender:dkim-signature;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        fh=41uWnoMSJfiPs7qS1cLuZ6B+SBLijc0d9vZaUodbMuY=;
-        b=gAHPkZm1D/9ocxjvkqLLMRGPpD2Ggzxe/oMg8L7SX+HbXdKqwGg76B+I2JPZcYME/K
-         BNtbHWMEuGti4S4BiMYGFz4nr44rOFQ5a6EgvXYp+lx8SgD76aizD5h93bHahANAVLns
-         bFshLfcbmY6rGE6qlNFMwTkF7SxmKcHsdKUg9iVKoU7fcy4kt6FuL+rQd+gLxhSZCtJ4
-         faJQcO8Q7iwdBixKqQs3Js8N5WHKVhPyHa/bAit/dukrz5M6yAESXlaUyzqiV1OZnZDb
-         K4wxEPGIu+SMkrtkak7FA5LcQ6BJmhOSUTlqpae7eRvp1T3Jfc35sd7rxPjpT/k8kchc
-         KLWA==;
-        dara=google.com
-ARC-Authentication-Results: i=4; mx.google.com;
-       dkim=pass header.i=@refugeerights.org header.s=google header.b=QKwXxek4;
-       arc=pass (i=2 spf=pass spfdomain=gmail.com dkim=pass dkdomain=gmail.com);
-       spf=pass (google.com: domain of info+bncbdo3x4ec2mebbjwrv3cqmgqev3uqc6i@refugeerights.org designates 2a00:1450:4864:20::447 as permitted sender) smtp.mailfrom=info+bncBDO3X4EC2MEBBJWRV3CQMGQEV3UQC6I@refugeerights.org;
-       dmarc=fail (p=NONE sp=QUARANTINE dis=NONE arc=pass) header.from=gmail.com;
-       dara=pass header.i=@refugeerights.org
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756080297; x=1756685097;
-        h=list-unsubscribe:list-archive:list-help:list-post
-         :x-spam-checked-in-group:list-id:mailing-list:precedence
-         :x-original-authentication-results:x-original-sender:to:subject
-         :message-id:date:from:mime-version:x-beenthere:sender:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        b=elA79qu/pxqWd7dkSMWEf5YNweSUK4IB5En54ggfqshBQsqOyM2Sr/0Gw1GOMp2w8r
-         e2nMmNjAi+3m4iP3UnOoWR8Wu+F3zN1UirX1rmLJsiyHU5fnX6wOnjytpktSy9WtWDCV
-         +7+v2b/FvvU+gbsC5MVQcAX6UBhFJD0Et8AO6IqqhSai+N2YLHGxKYVEC9MKPTaC/V5w
-         E5WDxLXnL7JTb0DKoOqcQWXLnWPsrLRKT7edr78FVy5d9tLCOuUnvXPglq7SRrLABgzJ
-         Mh9SN+HgU4+8ybT5YHzMO6R43zyfxujmrwnp0yOzE0FE1xYGIEBopLAq003I7JfrTRtB
-         4cSQ==
-X-Forwarded-Encrypted: i=4; AJvYcCXvuR7iV+YzmuB/8XViM5k6raLQNDb4wBU1glUd9sDJI8JyYB26vjM3zyWdDGiO8y7gWO737w==@refugeerights.org
-X-Gm-Message-State: AOJu0YwphkCCCMRyRoM6zb9vTmOe6k7iBRPT5gXl4deMsYqUbCf18Lzt
-	YT/fn4V63QZVCwKwk3DuRt0odKw/5XXpu/cZPWxmztwz8lR7LWytpzjWgiuiL8cLyXzn1AsNq3n
-	U+8ng4iqu5bgz8+ahuwr3PGdE4pKwya4zgaKSOHSQb1MhIjZ3EDdNEbHKoAM+lsZ5K9zREGA5eV
-	y1XwKxcfV8J2mS28sYX50TKvqvM6O4TE9OZv2xYA4Ou1+e4fjin1HeWTm0onhzlZHSZjcmuqcr0
-	QwcnuzTgN3oIdnuojJKgob5pjrD3Kb7xWU8Uy3AVzmqKmfX2810zcRUJ+fFOrhPf4dLysMT
-X-Gm-Gg: ASbGncuT4aFx0aChpcs5dGPdr19axxsNny91ffu7nz7hiOhxyhKoh96QXRzsfs0X7Sw
-	BbqRUMhYYg1cgzKqT9rG2JosAfst5K/skM6226qogwJTeaLWjE54heYn6qFYcvdH/n84PHylv6g
-	hSw7k9iBxG5p8vFYT/luTNNZSTl9mCJlaE3fCZ0ZUYkjliiQkJvmvfmwtijvZr2GYfPSgCgU/0Q
-	x+bILuPu1pLOPC2s/CgRSfDgi9+b8WESt81BkLUmFIHlu1DkoTIG/ggKXQLcC4kkv7DXUB8yEzg
-	3tWLyjccIs1TTPpumGlIY9iOJm2QZZQCEuSJmB1Ni3YseAEwvJwR+n/cF6j3yPG/FZegHKcIbGA
-	l6SjQmiRfV9fURgtX/7tMSwLYcaCS1oknMDtG
-X-Received: by 2002:a05:6402:40cd:b0:61a:2fc5:debc with SMTP id 4fb4d7f45d1cf-61c1b6e8a93mr8498838a12.32.1756080297416;
-        Sun, 24 Aug 2025 17:04:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGXGhLpD3yxXRkJuL6Vh+dWgDCSnfHIfV7My3fKijUIWX9pjR3N4OVcp/MdHhEFXP8V/g3s
-X-Received: by 2002:a05:6402:40cd:b0:61a:2fc5:debc with SMTP id 4fb4d7f45d1cf-61c1b6e8a93mr8498808a12.32.1756080296141;
-        Sun, 24 Aug 2025 17:04:56 -0700 (PDT)
-ARC-Seal: i=3; a=rsa-sha256; t=1756080296; cv=pass;
-        d=google.com; s=arc-20240605;
-        b=R62AHtCpvWj46fPHhVwD7nQ0UBWRzv0bmkwaCjb7xnpXFHlGKJFrKyRII3gGRt5Ntw
-         Z4rVbSV0TqkT03/BZfoGNEoWleo7rQlMFExBA91bkyXq1HrADGzZOaQzziT2zhCfaS2n
-         d9MmITfMNjyLD1SalPSOJimXBFoVzfkdIRiAZILHVJdROqkn6d3wykLgkCKEQA/gb56d
-         dps3Rb1ue44YLWrOfjLQAYvAmxWTZRqp2wNYAHsvG//eNR5TAOdHZUWqhDOAhATmRXSI
-         JXP9Z5A1RiW79PbbCutETcMdt11Q0i/Zag4SCQLs7LHVFh7Wx95t/lw3JOW3HEIorvi7
-         rX5Q==
-ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=list-unsubscribe:list-archive:list-help:list-post:list-id
-         :mailing-list:precedence:to:subject:message-id:date:from
-         :mime-version:sender:dkim-signature;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        fh=mnLbJJsyfRX4LFtBP+5lzV8faUj4/IqcvAQKjTCh6UM=;
-        b=ZhQylyIkrQFLHz9vAiXNqMSIr7L2EkZm78bAN0WLDkO2FK75QrFSYCaNvoL25gy1yQ
-         KwVGUg8trht0OryZlzOX0fZZ7Xz9/FbZPZLSzuG0ubxoPXNtRAHtzCg4YyS6OYPXm4fA
-         Dt52Z8+weLJmI424fFKrpbg9wVYeF4E0h2B8abkhLotgUJDvUu8J6wPUUnXxtfWpJvIT
-         Kll+y16DVr6L0ra9xXMKVV0fJLRgCNx8CM2Ukn3QM6+7iJule16BnOV1WjbiVk8QrLgo
-         wsSutRAmxAjRWsQFPA+k1b0n7UzEEzrquHE5Dmi5jVsPZI/zePLbwZjvKpOh71DA7+rR
-         KA0A==;
-        dara=google.com
-ARC-Authentication-Results: i=3; mx.google.com;
-       dkim=pass header.i=@refugeerights.org header.s=google header.b=QKwXxek4;
-       arc=pass (i=2 spf=pass spfdomain=gmail.com dkim=pass dkdomain=gmail.com);
-       spf=pass (google.com: domain of info+bncbdo3x4ec2mebbjwrv3cqmgqev3uqc6i@refugeerights.org designates 2a00:1450:4864:20::447 as permitted sender) smtp.mailfrom=info+bncBDO3X4EC2MEBBJWRV3CQMGQEV3UQC6I@refugeerights.org;
-       dmarc=fail (p=NONE sp=QUARANTINE dis=NONE arc=pass) header.from=gmail.com;
-       dara=pass header.i=@refugeerights.org
-Received: from mail-wr1-x447.google.com (mail-wr1-x447.google.com. [2a00:1450:4864:20::447])
-        by mx.google.com with ESMTPS id 4fb4d7f45d1cf-61c317b7263si2805757a12.427.2025.08.24.17.04.55
-        for <irapinfoarchive@refugeerights.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Aug 2025 17:04:55 -0700 (PDT)
-Received-SPF: pass (google.com: domain of info+bncbdo3x4ec2mebbjwrv3cqmgqev3uqc6i@refugeerights.org designates 2a00:1450:4864:20::447 as permitted sender) client-ip=2a00:1450:4864:20::447;
-Received: by mail-wr1-x447.google.com with SMTP id ffacd0b85a97d-3c79f0a5ff0sf479225f8f.3
-        for <irapinfoarchive@refugeerights.org>; Sun, 24 Aug 2025 17:04:55 -0700 (PDT)
-ARC-Seal: i=2; a=rsa-sha256; t=1756080295; cv=pass;
-        d=google.com; s=arc-20240605;
-        b=EBEw5ZxttTzdJYh29lZOurUBVO/cW8T58Z3uZnu7erJXXbr3Us2siLb2wJh5FjXXb8
-         C6q89X2DF6Y/28J0A0GKx+CjYDopVIZPbOlyrtp6qZpEZMIxRi8Yk3simfNLRT0RqAZr
-         ljX8giVBd1LFdmoExgtCRKfL7YtwZxpxLiMMEA7mnjXMlYD8xhKcJ9xF0p5JAprupkih
-         dj3wHCJDW3lGob2MhRf8DGJYvloxon2GxKAqJVM4biKUvMYW31cBn7DU+NbKxoXBcUH5
-         ge02QAJHf+ZaMz+9Y9oyr9TPDnTk1+RbfpzHa6/AQVuZnE232aJ0ZqTyURyGD/+HaOzo
-         eKWA==
+        b=gEBO9N5mqVthVeourkFGeoHsF+t51jWEKCTO4Tzj9tCdS2nklPx/Lsacpnu/TSx7Cd
+         LxIsy3npXc/905HohdEuR5o5ghQi/kE9rYBfQootq7kJdShOkZwmReXr+7CBzi3HJZI5
+         Ml+5Lxf5TGlh7Fkkw2qI+GEufJOaIDKfnJkW6h8ho8g7fm3QI68HMhZjqQWHaKQXNlhI
+         MQM6YC/hquFdPTfYUzhPrG0/K4UUDgca72HEk+WBmlCrJ8iuQSA7ulHlsaa4OjUISGJa
+         6/0mklYVu2+7TQuZwOaC7gTHWbLLsXsF17HvnzTmrEq0yV0qhh4n3KRgzU6Iz1yQdH/X
+         aw6A==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=list-unsubscribe:list-archive:list-help:list-post:list-id
-         :mailing-list:precedence:to:subject:message-id:date:from
-         :mime-version:sender:dkim-signature;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        fh=mnLbJJsyfRX4LFtBP+5lzV8faUj4/IqcvAQKjTCh6UM=;
-        b=I//BwTx7mocsonmYTz5es/hjvZAAV1gEMh1d91xjvGeGklG3LdCkt1uOGONEEPtnjy
-         yFliCXqbY/OqnQK6J2nkPl08BmraVzjgyp/Uys+JBUBupL0b423QwYnkSmp+FvAzs5ro
-         cwpN0aCuOMiRFUUYm+Z8AAbbxFUcO727taVsl5gz+PQ5kLrhw4uWyPIQdkF0jd9YwxR9
-         AcDmkpDYbv+80KHV8+mMDVCB8AqjKa/sfLsVzcJO2wIAdNDTy6WP+u4VihPydDArnj5C
-         8k/ghYJxEKMxuxUnXwjqCA5oUv8hzUck9JXKw+jDa8C5jn9nc72PDiArKvOBgkGH7xtP
-         6qsg==;
-        darn=refugeerights.org
-ARC-Authentication-Results: i=2; mx.google.com;
-       dkim=pass header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+";
-       spf=pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;
-       dara=pass header.i=@refugeerights.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=refugeerights.org; s=google; t=1756080295; x=1756685095; darn=refugeerights.org;
-        h=list-unsubscribe:list-archive:list-help:list-post:list-id
-         :mailing-list:precedence:x-original-authentication-results
-         :x-original-sender:to:subject:message-id:date:from:mime-version
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        b=QKwXxek4HTFdtOHd/PQPio2quZK7kcjhltwVjJgODqAeRgDyJKq4HCvU1QTvyuYEO/
-         WGPY5u3Tea6RD21scpK2n9/zO0k+pAh9iwTctEbex6AzH9KMh+zV/n3nFvYMEWyZYWg0
-         JmUvS0z674iisPF+Sqv4rTegGQKvfNZPQc3kw=
-Sender: info@refugeerights.org
-X-Forwarded-Encrypted: i=2; AJvYcCV4d3fN1roobVRWeedSwNS1X087433eg/lOy1d0+yUV+mWSK1wnvyRObetnwiIjd37WcnJY/3VsZQBR9DRQ2ts=@refugeerights.org
-X-Received: by 2002:a5d:5d01:0:b0:3c7:36f3:c358 with SMTP id ffacd0b85a97d-3c736f3c59cmr3862254f8f.32.1756080295176;
-        Sun, 24 Aug 2025 17:04:55 -0700 (PDT)
-X-Received: by 2002:a5d:5d01:0:b0:3c7:36f3:c358 with SMTP id ffacd0b85a97d-3c736f3c59cmr3862247f8f.32.1756080294779;
-        Sun, 24 Aug 2025 17:04:54 -0700 (PDT)
-X-BeenThere: info@refugeerights.org; h=AZMbMZeoEymGw0VQ7xL8mK6v8XcBQQ2RBWzU9uRs+9Yxf4EuBw==
-Received: by 2002:a05:6000:2209:b0:3b7:89fd:a28d with SMTP id
- ffacd0b85a97d-3c456e164c2ls1637607f8f.0.-pod-prod-01-eu; Sun, 24 Aug 2025
- 17:04:52 -0700 (PDT)
-X-Received: by 2002:a05:6000:188e:b0:3b8:d360:336f with SMTP id ffacd0b85a97d-3c5dc448b65mr7825066f8f.28.1756080292397;
-        Sun, 24 Aug 2025 17:04:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1756080292; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cfbxDCx/MfHAfwaCnavkepfuzGBhmLk7AF5UfmzJ4KFnypDFVV0S1fsX2ZBwqQBIAn
-         fi/I6/ObvSF6nFRmYRIRFsWC7yG10EsCeHepiQb6j5KByNz9XpHmCRSJOYDI1GQ/tSZT
-         Lbp6RwYcJD29z/w8jGXHgiqOlufcqkSF2SOEMlmFENsIkZG/yG9T6lloSBnkuvOA/Kn9
-         MWyGi6xOZbXAEWYfhuZdX/yQbRmyrAwBA8L+E6T+TnEMqAg/NRshkTLmIorV2/L2QjDQ
-         I1aYU3fe0ebpXsXP/N9nBdF2eYib7hG3xBANKiQfvESuHka1nP5HyJdlEzbdrFPVvMg8
-         6vuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=SCDnFpkElj74hUK1SyCnugfMzjPZQQ+l1WBfEx/gipE=;
-        fh=F4l5LRX69OM5dBT56tN7FoiWC+A8R2Br5D1rHZ0HKV4=;
-        b=P5lbG2/H6YJxe7rxGLvA/NelErDUAXEceBVPEimkW5uJLs/ov19yRlahA2II6r4416
-         lB1lOpZnllI2C8Puet3xTqsRZJuiGe99l7n2a0YzA5xB0HZrLHzbzLuc1F0crCI5WjTd
-         +rmhpkHL4yZS/zRzXJy9qGk/R6SPNFv7qHestdBbePMQRnbTvytBFLz+NqtIyg6yTScN
-         1YDsOdABVXp3tnpFunq65LI8X6d7ETAqFiEv3t2Tog3jwYodx5HpVgn6YZUqa+HL54RZ
-         5bGe75ZVxO9QibxB5mr8WuSlkwJ8sxbV3/3W5QYpn+ztHEjzPdTdAGwvXPnza9VvmvJ4
-         tnmQ==;
+        h=mime-version:msip_labels:content-language:accept-language
+         :message-id:date:thread-index:thread-topic:subject:to:from;
+        bh=8r15karoMut1kkFIYPyQzHGjIeNdMCHnIscmzWo9o+0=;
+        fh=1cjJU4bAnaHI+yBq09744/rZp/fe1o/KAddR2JZPePI=;
+        b=lK22H6M60y53DQBxUKUsMjk72dsanD4Q6DHpH1geD7h2wjWnvpi+inmFMo9rpEVvFH
+         IEL8mjX8qHWIXJ4OYjsGrPc5NlneXsvby5FZaOqChpqhi7WhzQtCNO9h2iZS5qtLySy8
+         6d88MR7bDuOOj4/kI0tRmCl1X46HvuEUNi5k5Z/kJenmaEEwLFrrodM5EmUundbZWkc1
+         K4UcZEMFTJFlXqvqb2uamS5H837ZBrvIYgXUnkyUNAMMkTeCgXWIEh0ujLGos1vnpm13
+         lefGH0PZk1r8H6k3DeSugLPKNKYNkjpo7bLua8yuLFLhWi1U3aJVuPM7R4PK7Li0SuoJ
+         C5iw==;
         dara=google.com
-ARC-Authentication-Results: i=1; mx.google.com;
-       dkim=pass header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+";
-       spf=pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;
-       dara=pass header.i=@refugeerights.org
-Received: from ec2-34-245-54-67.eu-west-1.compute.amazonaws.com (cd-euw1.prod.hydra.sophos.com. [198.154.180.138])
-        by mx.google.com with ESMTPS id ffacd0b85a97d-3c70ef57a0fsi2889785f8f.1.2025.08.24.17.04.52
-        for <info@refugeerights.org>
+ARC-Authentication-Results: i=2; mx.google.com;
+       arc=pass (i=1 spf=pass spfdomain=m3651.emailblr1.com dkim=pass dkdomain=m3651.emailblr1.com dmarc=pass fromdomain=m3651.emailblr1.com);
+       spf=none (google.com: user1@m3651.emailblr1.com does not designate permitted sender hosts) smtp.mailfrom=user1@m3651.emailblr1.com
+Return-Path: <user1@m3651.emailblr1.com>
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazlp170120007.outbound.protection.outlook.com. [2a01:111:f403:c101::7])
+        by mx.google.com with ESMTPS id 00721157ae682-788221590c9si87875957b3.442.2025.11.19.07.58.10
+        for <user2@g-suite1.emailblr1.com>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 17:04:52 -0700 (PDT)
-Received-SPF: pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) client-ip=209.85.216.41;
-Received: from ip-172-19-1-134.eu-west-1.compute.internal (ip-172-19-1-134.eu-west-1.compute.internal [127.0.0.1])
-	by ec2-34-245-54-67.eu-west-1.compute.amazonaws.com (Postfix) with ESMTP id 4c99yr0kjsznTVn
-	for <info@refugeerights.org>; Mon, 25 Aug 2025 00:04:52 +0000 (UTC)
-Received-SPF: pass receiver=mx-01-eu-west-1.prod.hydra.sophos.com; client-ip=209.85.216.41; envelope-from=<rohullahrahmanee@gmail.com>; helo=mail-pj1-f41.google.com;
-X-Sophos-Email-ID: d85445c6ec3c4329973975dd8c828573
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-01-eu-west-1.prod.hydra.sophos.com (Postfix) with ESMTPS id 4c99yh6L7HzgY8L
-	for <info@refugeerights.org>; Mon, 25 Aug 2025 00:04:44 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-32326e2f0b3so2873282a91.2
-        for <info@refugeerights.org>; Sun, 24 Aug 2025 17:04:44 -0700 (PDT)
-X-Received: by 2002:a17:90b:2890:b0:325:65ef:5961 with SMTP id
- 98e67ed59e1d1-32565ef5f92mr6611812a91.33.1756080283088; Sun, 24 Aug 2025
- 17:04:43 -0700 (PDT)
+        Wed, 19 Nov 2025 07:58:10 -0800 (PST)
+Received-SPF: none (google.com: user1@m3651.emailblr1.com does not designate permitted sender hosts) client-ip=2a01:111:f403:c101::7;
+Authentication-Results: mx.google.com;
+       arc=pass (i=1 spf=pass spfdomain=m3651.emailblr1.com dkim=pass dkdomain=m3651.emailblr1.com dmarc=pass fromdomain=m3651.emailblr1.com);
+       spf=none (google.com: user1@m3651.emailblr1.com does not designate permitted sender hosts) smtp.mailfrom=user1@m3651.emailblr1.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LSNWO8/Qflkrz/qojUjjeP+nX/yJ8wfSreSnMk5U2AO/OCKMfYJzjtIFMfY7WqmEbFZ/QmiEejHDfYa1mTK2O3hF/Qdf5Gmp9Ji/JwWnTu0fjideyaVURic/OUcRV0JJlwsrIRkV4WCBcm1Gov76SEaH57FHXAeCWg86kBBwTkoOC2MujKyx8W5K+xWIBBUegLhhXuKsKv3iW0jaaMcrwIF6dSJ1N0x7+MAppuYZHdyOPg7ehtyOWJ0Fym1/ubpY+Zp7D3c/+cLRHzADS5sfox+tlOf5rcA2JyE/07SgWpLLFplkK2ax95gO9d3vuaucVmIK6VcUkHwO9OsA29FvcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=m3651.emailblr1.com; dmarc=pass action=none
+ header.from=m3651.emailblr1.com; dkim=pass header.d=m3651.emailblr1.com;
+ arc=none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8r15karoMut1kkFIYPyQzHGjIeNdMCHnIscmzWo9o+0=;
+ b=A341KBzqUUCsAus9JrlBNHfirO3yQwDLlUQA7KPNFeccwqBW5WA7O3x3QBBmxq1vKID1+I0K/uGeQnQYICm7fDaFIaVOxWp5mSbo4PmFi1/vEtTYU2bBOu8Gf4ZOYHW3ljuG67yggf84XCnnVcbhKsWUsKoRMF9KwtnLocfOHg6sUp4K6CtE0RERXmY+DcECeD6Usm9eNekTnCWq/7hPQInDPZgqp3eH87cbTuZj9HTHcr8w+QIHNYYz/IMI767yRExmz9xmQq2+3MlhN/MWHm7SI02Nl2H0J0uRSe1uQDi/J7AylCZQgHnvnMS82fpgcQHmVO7aoAFljHX1YHcVxQ==
+Received: from BN9PR12MB5035.namprd12.prod.outlook.com (2603:10b6:408:134::8)
+ by MW3PR12MB4428.namprd12.prod.outlook.com (2603:10b6:303:57::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
+ 2025 15:58:03 +0000
+Received: from BN9PR12MB5035.namprd12.prod.outlook.com
+ ([fe80::7c9a:4071:8e0e:c38d]) by BN9PR12MB5035.namprd12.prod.outlook.com
+ ([fe80::7c9a:4071:8e0e:c38d%3]) with mapi id 15.20.9343.009; Wed, 19 Nov 2025
+ 15:58:03 +0000
+From: User 1 <user1@m3651.emailblr1.com>
+To: User Two <user2@g-suite1.emailblr1.com>
+Subject: M365 - Gsuite - Direct
+Thread-Topic: M365 - Gsuite - Direct
+Thread-Index: AQHcWW05waWn/7KRlEuy7C+up8aEKw==
+Date: Wed, 19 Nov 2025 15:58:03 +0000
+Message-ID: <1787189503.0.1763610587638@[192.168.1.29]>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Enabled=True;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_SiteId=6afc341f-f862-4778-a66d-5a6b324c10c7;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_SetDate=2025-11-19T15:58:02.926Z;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Name=All
+ Employees
+ (unrestricted);MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_ContentBits=1;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Method=Standard;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=m3651.emailblr1.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR12MB5035:EE_|MW3PR12MB4428:EE_
+x-ms-office365-filtering-correlation-id: 8fd3c25e-cae3-4d75-351e-08de27846bd9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|10070799003|34036016|376014|366016|41320700013|1800799024|8096899003|38070700021;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?tAMBTo0YP9UG+RJS2pvXU7AMzsLjh/8wK6vaOo8hUVCdspG6+4WQp1BAFY?=
+ =?iso-8859-1?Q?XBYNTMAyZ7kyxUj3gOWNiVB4U17ViIBmdOhyWcTPUrOHA5Zrxe1kpqnF0A?=
+ =?iso-8859-1?Q?ekplfKhLyPHKlt7bCRgs2y5gTKzHJ2NSIP395owJ61IqMAtcY0VI4HqteV?=
+ =?iso-8859-1?Q?ePqlvqNMlNjJAAe+CfxeCMA1zSUYSlPaXgQXyvbPTi36v+81yJpFR9u0c0?=
+ =?iso-8859-1?Q?fKdsRn5rHyYK41mrcLqsAj/Z45cnN80FkCl9buhIe07MDWYcV5/wg9op/9?=
+ =?iso-8859-1?Q?O+9oHzXRK9A3UJqDmt9n7wiwiauuMrinEJCMZEGcRp4mhA9XFZJbP4G2I8?=
+ =?iso-8859-1?Q?T5tJ30zHF7qkqt36cBGH7k6eOgTNXASE+H+R6BVBvgLEeQBrHkYiZntzXT?=
+ =?iso-8859-1?Q?xa91Pu7D+ongv5kLbaS6EKe08DQo2q/jEjUGxWNxUxhEUjWBYgiE6HLaND?=
+ =?iso-8859-1?Q?yPYNLUVIWnpBjorUJ/94bJtb9smaYJzc7K6eVpyRO5w6bU58fWB0cxcqG1?=
+ =?iso-8859-1?Q?eEamht3dhqPv9K97dkrWMXawwpEK2PiWVaeP7NWwg1/1Bk0MNcileMEtfJ?=
+ =?iso-8859-1?Q?aIBlFId10uMVJU15K7Kj2NaESCeKn5M7FIxV5Gi1lu9Q7+R7UYnGakWlnf?=
+ =?iso-8859-1?Q?JqXRfL2pcDmNe7DIFKXVA09zEHWMr5rbz6VZ2H3l7PoHG0Kruf8z9YAbIA?=
+ =?iso-8859-1?Q?kydT8ZTDgNTO8VLEni403yQ3xdGn+iwXqc2f2G/u8rHW2MgAOGoxkNwjzE?=
+ =?iso-8859-1?Q?xb/GFxnQFwK7laJhSn8DAm4PZbHw7BkGuPFVYX5FUBvcTQZQPMS5z5Wrwa?=
+ =?iso-8859-1?Q?XrdH5ViR+8PSvKgJEnKFD3oKzRdLpUiCsWYFttE3cOnSPjN5gWkEU/gh41?=
+ =?iso-8859-1?Q?FumZ5p2Z7B70YKIi2rycXn8vQNND0i9OSGNh5ixn6mQASKWF5fk7yc7EPS?=
+ =?iso-8859-1?Q?xYZpIFaH7ofWUoUeJssv59EcHfHMgP+Gs1DowO4MNu++zW6e/SaPa/RPLl?=
+ =?iso-8859-1?Q?bCBp5UXevOZbhX9rtvrX5mc3qzxcbpiHosm0hIelo4U9V2CjBiYPZQ7VZY?=
+ =?iso-8859-1?Q?SpIOT/m6qO7lRrkVJH1he+CS5EHa3XGlpT1DbbBSy3CSIHsHPJByjy4YqN?=
+ =?iso-8859-1?Q?BsgeFFyXxy1MPIn0B2KJGx3r29HS7xw0fI1bmWAbZBL2n5EGZQR6t0Abgh?=
+ =?iso-8859-1?Q?PdDjs4xOjBiDSA+fh+D1y3OyL3O+MuvJgCN/rmLTjo4iwprfx7bqnuk/8f?=
+ =?iso-8859-1?Q?iz5dyPP7Z4fnxzIfHJywA7rYCpHwfy2+MoP7AZnpi9IMWn3l2Fil+IAIJE?=
+ =?iso-8859-1?Q?m72I/W1J2tNAEOvzBPAmyxD7ugjBiBf5AT59SyXaVs1P2GVTEzraUOeslR?=
+ =?iso-8859-1?Q?/NcYIeowsahFyA5RP2WLWM8f40HGJMa3fSQJvWcCSedYB9n1M2txCoqIw2?=
+ =?iso-8859-1?Q?VkIEjqCDJr8h5qUXqSDU4Q2quVnSfP1Xucp7cBDmaccJ/tZvs+59EJ9SzO?=
+ =?iso-8859-1?Q?OatRv31rObXXJnMsh7J5ARMItD5T97keXMI60t8hbIMAekPoQbWc531Pus?=
+ =?iso-8859-1?Q?rviBOdHKQnLaY41iQrT/WXa6HaEp?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5035.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(34036016)(376014)(366016)(41320700013)(1800799024)(8096899003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?5LMrVgf9f2Z+oAtuR97RXeS1gW8PjvkMYi+MtIGZx1CMQXBNjnrGwWA66n?=
+ =?iso-8859-1?Q?sqr+EAcAWKlR6BwYfopGZqd8t/rDaDE3RuAIsMcqLfzoRp+XOUE6cZISc3?=
+ =?iso-8859-1?Q?ciggq+Us7r/Y8iHGZ5p6BbNYqQ7fDIRCcJS2XiktHJN0PZDUExZB0MfLcG?=
+ =?iso-8859-1?Q?1vyb+7CHOxAJOMod79Pkvi656ijT/92sFYFZi05jEEPtsJPTFLrOskixeC?=
+ =?iso-8859-1?Q?CCsUw332i2lZtkRjIl9Hjiqw/j4gZLi4Xhp+RZ3wsiLeRW9eD7rlCH9HJg?=
+ =?iso-8859-1?Q?GwKFIkpF2+77qIav3imEsUcpCuHe2G4HBinlZl9cHxBjtnQHagd76uPBMb?=
+ =?iso-8859-1?Q?vlQQUV/IM46ZPmgWU4MPM3vVCb5V5P6GsN/cjnTUe3//Zz3/bhGu1vZDLT?=
+ =?iso-8859-1?Q?UXM/fM2y1/rWyRcHvfJcCf7K4bhlJySH6h4odtkuKPdOAMH7C3eMg4dVRE?=
+ =?iso-8859-1?Q?hNLTWLJAjuue289TsRbEuUss9S4JB3o5b8H0rSeRHzSPt67tUyWT7iNOSg?=
+ =?iso-8859-1?Q?V6ZW/6o3h0KtjVHikn7GLPyKIwtAJpZ/CeapdoZuYPKwYDB2pKj11COwIN?=
+ =?iso-8859-1?Q?C8sxtEZXAY3a3PfYvoiwv2LTRStN0SgyoemllMPg0dJJzYfxUCtHSie/4T?=
+ =?iso-8859-1?Q?NOywiL8vXou7RMwIpNIM9sp6ONhVLBWxuBQ+UFlaCrCGGYWq60ipMFKbMi?=
+ =?iso-8859-1?Q?Ocddn3pq+fXsNbudShPaNFUZaRnnSmrbqIJ/rURYMcUg12uX47mH5XTW9F?=
+ =?iso-8859-1?Q?b/FJFntZoysgKtRdVGhQzkmuewIQHKFyF6IuxKJdpt4k1fgh6ls4ItqT38?=
+ =?iso-8859-1?Q?zG0m7W/xqyEmixM4zUSzb1CYTo9yuHEB1LhMRXq9vC56pv5d4ZYBeCi36U?=
+ =?iso-8859-1?Q?prLo8JsTKCBp6fZrIlpSuNJEr3y0MVjkr4Pi+y1TADvITAaYmQ2g3tDmnO?=
+ =?iso-8859-1?Q?v3alLJ5eNUG5Mqsx82XotxmofACJJuK9oS6KxY0KuoQyqPnFuvilGeNvWm?=
+ =?iso-8859-1?Q?0YTi1guELk4SBw3XxX/XQfIwa3cVtqfAwsZ67o+4czbgbuWjUoBqtn4DfF?=
+ =?iso-8859-1?Q?n5a+x4W9AxSuquwY12EcIpwZueRfN2KM2IY3+8W/A02GieHsGOvDs5Q05C?=
+ =?iso-8859-1?Q?zF7QGubEJksd+HyaOaVU2M+CnQJRYVSlNqMb3z5tB4OMsU/lZYtS28QQQ6?=
+ =?iso-8859-1?Q?wCy8fHXw8nFv1dTEnc5I2+PuNPz9dklEz4Jc/MbLWIsyVQlaDOsyct9C+O?=
+ =?iso-8859-1?Q?Xz1fRLo3Xxtf4X9U/ky8YaJ1FpGjRxt/4WVarOdM9b5+h8VvURI8XI0j+o?=
+ =?iso-8859-1?Q?L1Bgwjh5/r4mxbMBwXk2cVIbXK9j/NqavH5LEmZog1KmVHIKvrPfdel9WH?=
+ =?iso-8859-1?Q?elBWCyQJdsxiCQaaqsDzeh2vMhWbWPf92PRbMVboy83HHessb6BYmPetXK?=
+ =?iso-8859-1?Q?KIaVntBq0dIsKL/VnW7SrxGfZsWL+UwX7P+OEQFSgHxXW4E7JQSXuhXM1j?=
+ =?iso-8859-1?Q?6x8sObjH8QIMW0NGGGAahjMu5wGTVf/L32xOzjn3blKUnTv0nJ8g1pFX3Z?=
+ =?iso-8859-1?Q?nu4/JNICp4HNZHn7EdhEgzlBzMmXY69DUGL/X3cI+bmNadFBOg1ESWH7sj?=
+ =?iso-8859-1?Q?Pr1yqTmJbssVclt/3NHDBb4ZRDLVafVCQllwbzYwduBOX9Qp+vH5nNH27Y?=
+ =?iso-8859-1?Q?t1oS4lSyA08ujRP0XHFr/JU9UCaCjb65KuW0MZEG?=
+Content-Type: multipart/alternative;
+	boundary="_000_BN9PR12MB50358D74C0E54DF35B88C4E7F6D7ABN9PR12MB5035namp_"
 MIME-Version: 1.0
-From: Rohullah Rahmanee <rohullahrahmanee@gmail.com>
-Date: Mon, 25 Aug 2025 04:33:47 +0430
-X-Gm-Features: Ac12FXzQt-ylJLJONHoPdwpxvYnhe8XK1CA7GonzeFk4xRSX-webaomH6zFkb1E
-Message-ID: <CAJua+q5t83rKO4zBp_mszL4wHdoV9KzZKtcyDGaap6QAi_6v9w@mail.gmail.com>
-Subject: Request for Assistance from an Afghan Ally
-To: info@refugeerights.org
-Content-Type: multipart/alternative; boundary="000000000000787c03063d254db8"
-X-Sophos-Email: [eu-west-1] Antispam-Engine: 6.0.2, AntispamData: 2025.8.24.232719
-X-Sophos-SenderHistory: ip=209.85.216.41,fs=182270880,fso=182270880,da=249538897,mc=929794,sc=20604,hc=909190,sp=2,re=0,sd=0,hd=30
-X-Sophos-DomainHistory: d=gmail.com,fs=282,fso=105042192,da=110281721,mc=141,sc=6,hc=135,sp=4,re=1216,sd=3,hd=27
-X-LASED-SpamProbability: 0.079439
-X-LASED-Hits: AUTH_RES_PASS 0.000000, BODYTEXTH_SIZE_10000_LESS 0.000000, BODYTEXTP_SIZE_3000_LESS 0.000000, BODY_SIZE_2000_2999 0.000000, BODY_SIZE_5000_LESS 0.000000, BODY_SIZE_7000_LESS 0.000000, DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000, DQ_S_H 0.000000, HTML_BAD_EXTRAS 0.000000, HTML_NO_HTTP 0.100000, IMP_FROM_NOTSELF 0.000000, INBOUND_SOPHOS 0.000000, INBOUND_SOPHOS_TOP_REGIONS 0.000000, KNOWN_MTA_TFX 0.000000, NO_CTA_FOUND 0.000000, NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_FOUND 0.000000, NO_URI_HTTPS 0.000000, SXL_IP_TFX_WM 0.000000, TEXT_DIRECTION 0.000000, WEBMAIL_SOURCE 0.000000, __ATTACH_CTE_QUOTED_PRINTABLE 0.000000, __AUTH_RES_CEMA_DMARC_PASS 0.000000, __AUTH_RES_CEMA_SPF_PASS 0.000000, __AUTH_RES_CEMA_SPF_PASS_POL 0.000000, __AUTH_RES_DKIM_PASS 0.000000, __AUTH_RES_DMARC_PASS 0.000000, __AUTH_RES_PASS 0.000000, __BEC_SUBJ_KEYWORD 0.000000, __BODY_NO_MAILTO 0.000000, __BODY_TEXT_X4 0.000000, __CT 0.000000, __CTYPE_HAS_BOUNDARY 0.000000, __CTYPE_MULT
- IPART 0.000000, __CTYPE_MULTIPART_ALT 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000, __DQ_D_H 0.000000, __DQ_IP_FSO_LARGE 0.000000, __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000, __DQ_S_DOMAIN_100K 0.000000, __DQ_S_DOMAIN_10K 0.000000, __DQ_S_DOMAIN_1K 0.000000, __DQ_S_DOMAIN_HD_10_P 0.000000, __DQ_S_DOMAIN_HD_1_P 0.000000, __DQ_S_DOMAIN_HD_20_P 0.000000, __DQ_S_DOMAIN_HD_5_P 0.000000, __DQ_S_DOMAIN_HIST_1 0.000000, __DQ_S_DOMAIN_MC_100_P 0.000000, __DQ_S_DOMAIN_MC_10_P 0.000000, __DQ_S_DOMAIN_MC_1_P 0.000000, __DQ_S_DOMAIN_MC_50_P 0.000000, __DQ_S_DOMAIN_MC_5_P 0.000000, __DQ_S_DOMAIN_RE_100_P 0.000000, __DQ_S_DOMAIN_SC_1_P 0.000000, __DQ_S_DOMAIN_SC_5_P 0.000000, __DQ_S_DOMAIN_SD_1_P 0.000000, __DQ_S_HIST_1 0.000000, __DQ_S_HIST_2 0.000000, __DQ_S_IP_HD_10_P 0.000000, __DQ_S_IP_MC_100_P 0.000000, __DQ_S_IP_MC_10_P 0.000000, __DQ_S_IP_MC_1K_P 0.000000, __DQ_S_IP_MC_1_P 0.000000, __DQ_S_IP_MC_5_P 0.000000, __DQ_S_IP_RE_0 0.000000, __DQ_S_IP_RE
- _49_L 0.000000, __DQ_S_IP_RE_4_L 0.000000, __DQ_S_IP_RE_99_L 0.000000, __DQ_S_IP_RE_9_L 0.000000, __DQ_S_IP_SC_100_P 0.000000, __DQ_S_IP_SC_10_P 0.000000, __DQ_S_IP_SC_1_P 0.000000, __DQ_S_IP_SC_5_P 0.000000, __FRAUD_COMMON 0.000000, __FRAUD_INTRO 0.000000, __FRAUD_LOC 0.000000, __FRAUD_PARTNERSHIP 0.000000, __FRAUD_WEBMAIL 0.000000, __FRAUD_WEBMAIL_FROM 0.000000, __FROM_DOMAIN_NOT_IN_BODY 0.000000, __FROM_GMAIL 0.000000, __FROM_NAME_NOT_IN_BODY 0.000000, __FUR_RDNS_GMAIL 0.000000, __HAS_FROM 0.000000, __HAS_HTML 0.000000, __HAS_MSGID 0.000000, __HEX28_LC_BOUNDARY 0.000000, __HTML_ATTR_DIR 0.000000, __HTML_BAD_END 0.000000, __HTML_BAD_START 0.000000, __HTML_TAG_DIV 0.000000, __IMP_FROM_FREEMAIL 0.000000, __IMP_FROM_NOTSELF 0.000000, __INBOUND_SOPHOS_EU_WEST_1 0.000000, __JSON_HAS_MODELS 0.000000, __JSON_HAS_SCHEMA_VERSION 0.000000, __JSON_HAS_SENDER_AUTH 0.000000, __JSON_HAS_TENANT_DOMAINS 0.000000, __JSON_HAS_TENANT_ID 0.000000, __JSON_HAS_TENANT_SCHEMA_VERSION 0.000000, __JSON_HAS
- _TENANT_VIPS 0.000000, __JSON_HAS_TRACKING_ID 0.000000, __MIME_HTML 0.000000, __MIME_TEXT_H 0.000000, __MIME_TEXT_H1 0.000000, __MIME_TEXT_H2 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000, __MIME_TEXT_P2 0.000000, __MIME_VERSION 0.000000, __MTHREAT_15 0.000000, __MTL_15 0.000000, __PHISH_SPEAR_GREETING 0.000000, __PRODUCT_TYPE_GATEWAY 0.000000, __RDNS_WEBMAIL 0.000000, __SANE_MSGID 0.000000, __SCAN_DETAILS 0.000000, __SCAN_DETAILS_SANE 0.000000, __SCAN_DETAILS_TL_0 0.000000, __SUBJ_ALPHA_END 0.000000, __TO_MALFORMED_2 0.000000, __TO_NO_NAME 0.000000, __URI_NO_MAILTO 0.000000, __X_GM_MESSAGE_STATE 0.000000, __X_GOOGLE_DKIM_SIGNATURE 0.000000, __X_GOOGLE_SMTP_SOURCE 0.000000, __YOUTUBE_RCVD 0.000000
-X-LASED-Impersonation: False
-X-LASED-Spam: NonSpam
-X-Original-Sender: rohullahrahmanee@gmail.com
-X-Original-Authentication-Results: mx.google.com;       dkim=pass
- header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+";       spf=pass
- (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as
- permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;       dara=pass header.i=@refugeerights.org
-Precedence: list
-Mailing-list: list info@refugeerights.org; contact info+owners@refugeerights.org
-List-ID: <info.refugeerights.org>
-X-Spam-Checked-In-Group: info@refugeerights.org
-X-Google-Group-Id: 633893030637
-List-Post: <https://groups.google.com/a/refugeerights.org/group/info/post>, <mailto:info@refugeerights.org>
-List-Help: <https://support.google.com/a/refugeerights.org/bin/topic.py?topic=25838>,
- <mailto:info+help@refugeerights.org>
-List-Archive: <https://groups.google.com/a/refugeerights.org/group/info/>
-List-Unsubscribe: <mailto:googlegroups-manage+633893030637+unsubscribe@googlegroups.com>,
- <https://groups.google.com/a/refugeerights.org/group/info/subscribe>
+X-OriginatorOrg: m3651.emailblr1.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5035.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8fd3c25e-cae3-4d75-351e-08de27846bd9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2025 15:58:03.1401
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 6afc341f-f862-4778-a66d-5a6b324c10c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6FJT7UR8rD8m8M+MMWSTCbc9ppVCopRiG0DhyLjT8DUMFxI5iUyNrrzY26pE6e0E/fOHBbETMADH7GZ+jJnBJVZZhBX9SXvOIX4WCo+xFIc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4428
 
---000000000000787c03063d254db8
-Content-Type: text/plain; charset="UTF-8"
-
-Dear Refugee Rights OrgTeam,
-
-I hope this message finds you well.
-
-My name is Rohullah Rahmani, and I am reaching out to seek your support. I
-served with the Afghan government during the NATO and U.S. presence in
-Afghanistan, contributing to efforts aimed at rebuilding our nation.
-Unfortunately, since the government's collapse, I have faced significant
-challenges, including threats to my safety and limited opportunities to
-live and work freely.
-
-I am seeking assistance to find a pathway to safety and stability, possibly
-through resettlement programs or humanitarian parole. I have gathered
-documentation of my service and am prepared to provide any additional
-information required.
-
-I understand the demands on your organization are immense, but any guidance
-or support you can offer would be deeply appreciated. Your assistance could
-be a pivotal step toward a safer and more hopeful future for me.
-
-Thank you for considering my request.
-
-Warm regards,
-
-Rohullah Rahmani
-+93764675793
-
---000000000000787c03063d254db8
-Content-Type: text/html; charset="UTF-8"
+--_000_BN9PR12MB50358D74C0E54DF35B88C4E7F6D7ABN9PR12MB5035namp_
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div dir=3D"auto">Dear Refugee Rights OrgTeam,</div><div =
-dir=3D"auto"><br></div><div dir=3D"auto">I hope this message finds you well=
-.</div><div dir=3D"auto"><br></div><div dir=3D"auto">My name is Rohullah Ra=
-hmani, and I am reaching out to seek your support. I served with the Afghan=
- government during the NATO and U.S. presence in Afghanistan, contributing =
-to efforts aimed at rebuilding our nation. Unfortunately, since the governm=
-ent&#39;s collapse, I have faced significant challenges, including threats =
-to my safety and limited opportunities to live and work freely.</div><div d=
-ir=3D"auto"><br></div><div dir=3D"auto">I am seeking assistance to find a p=
-athway to safety and stability, possibly through resettlement programs or h=
-umanitarian parole. I have gathered documentation of my service and am prep=
-ared to provide any additional information required.</div><div dir=3D"auto"=
-><br></div><div dir=3D"auto">I understand the demands on your organization =
-are immense, but any guidance or support you can offer would be deeply appr=
-eciated. Your assistance could be a pivotal step toward a safer and more ho=
-peful future for me.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Tha=
-nk you for considering my request.</div><div dir=3D"auto"><br></div><div di=
-r=3D"auto">Warm regards,</div><div dir=3D"auto"><br></div><div dir=3D"auto"=
->Rohullah Rahmani=C2=A0</div><div dir=3D"auto">+93764675793</div><div dir=
-=3D"auto"><br></div></div>
+M365 - Gsuite - Direct
 
---000000000000787c03063d254db8--
+--_000_BN9PR12MB50358D74C0E54DF35B88C4E7F6D7ABN9PR12MB5035namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, =
+Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" clas=
+s=3D"elementToProof">
+M365 - Gsuite - Direct</div>
+</body>
+</html>
+
+--_000_BN9PR12MB50358D74C0E54DF35B88C4E7F6D7ABN9PR12MB5035namp_--
