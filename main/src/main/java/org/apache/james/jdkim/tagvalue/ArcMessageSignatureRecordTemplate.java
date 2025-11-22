@@ -19,6 +19,8 @@
 
 package org.apache.james.jdkim.tagvalue;
 
+import java.util.Set;
+
 import static org.apache.james.jdkim.parser.DKIMQuotedPrintable.dkimQuotedPrintableDecode;
 
 public class ArcMessageSignatureRecordTemplate extends SignatureRecordTemplate
@@ -44,5 +46,32 @@ public class ArcMessageSignatureRecordTemplate extends SignatureRecordTemplate
     @Override
     public CharSequence getIdentity() {
         return dkimQuotedPrintableDecode("@" + getDToken());
+    }
+
+
+    public String toString() {
+        return updateStringRepresentation();
+    }
+
+    private String updateStringRepresentation() {
+        // calculate a new string representation
+        StringBuilder res = new StringBuilder();
+        Set<String> s = getTags();
+        res.append(" ");
+        res.append("i");
+        res.append("=");
+        res.append(getValue("i"));
+        res.append(";");
+        for (String tag : s) {
+            if (tag.equalsIgnoreCase("i"))
+                continue;
+            res.append(" ");
+            res.append(tag);
+            res.append("=");
+            res.append(getValue(tag));
+            res.append(";");
+        }
+        // TODO add folding
+        return res.toString();
     }
 }

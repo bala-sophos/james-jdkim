@@ -112,13 +112,11 @@ public class ArcTest
                      + " spf=pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;";
 
 
-        String sealTemplate = "a=rsa-sha256; b=; cv=pass; s=sophos100; d=g-suite1.emailblr1.com; i="+ instance +";";
-
+        String sealTemplate =  "i="+ instance + "; a=rsa-sha256; b=; cv=pass; s=sophos100; d=g-suite1.emailblr1.com;";
 
         String as = signer.seal(ams,
                                 aar,
                                 sealTemplate, instances);
-
 
         instances.put(instance, new HashMap<>());
         instances.get(instance).put("arc-seal", as);
@@ -183,7 +181,7 @@ public class ArcTest
         throws Exception
     {
         String signatureTemplate = "i=3; a=rsa-sha256; c=relaxed/relaxed; d=g-suite1.emailblr1.com; h=date:from:subject; q=dns/txt; s=sophos100;";
-        String sealTemplate = "a=rsa-sha256; b=; cv=pass; s=sophos100; d=g-suite1.emailblr1.com; i=3;";
+        String sealTemplate = "i=3; a=rsa-sha256; b=; cv=pass; s=sophos100; d=g-suite1.emailblr1.com;";
         String aar = "i=3; mx.g-suite1.emailblr1.com;"
                      + " dkim=pass header.i=@gmail.com header.s=20230601 header.b=\"QzZwwS/+\";"
                      + " spf=pass (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41 as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;";

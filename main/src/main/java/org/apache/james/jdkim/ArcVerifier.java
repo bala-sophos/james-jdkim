@@ -176,7 +176,7 @@ public class ArcVerifier extends DKIMVerifier
         catch(PermFailException | TempFailException e)
         {
             log.error("Error during ARC validation: {}", e.getMessage(), e);
-            return ArcValidationResult.fail("Error during ARC validation.");
+            return ArcValidationResult.fail(e.getMessage());
         }
     }
 
@@ -261,7 +261,8 @@ public class ArcVerifier extends DKIMVerifier
 
             // Add the current ARC-Seal header without the signature (b=) value
             //String currentArcSeal = instances.get(currentInstance).get("arc-seal");
-            String modifiedSeal = tvl.toUnsignedString();//currentArcSeal.replaceAll("b=[^;]+", "b=");
+            //String modifiedSeal = arcSeal.replaceAll("b=[^;]+", "b=");
+            String modifiedSeal = tvl.toUnsignedString();
             log.debug("Modified ARC-Seal for verification: {}", modifiedSeal);
             updateSignature(signature, true, AS_HEADER_LOWER, AS_HEADER_LOWER + ":" + modifiedSeal);
 
@@ -285,8 +286,8 @@ public class ArcVerifier extends DKIMVerifier
         }
         catch(SignatureException e)
         {
-            log.error("Error verifying ARC-Seal: {}", e.getMessage(), e);
-            throw new PermFailException(e.getMessage());
+            log.error("Signing error. {}", e.getMessage(), e);
+            throw new PermFailException("Signature error.", tvl, e);
         }
     }
 
@@ -393,7 +394,7 @@ public class ArcVerifier extends DKIMVerifier
             signatureVerify(headers, signatureRecord, decoded,
                             publicKeyRecord, signedHeadersList);
         } catch (IllegalArgumentException e) {
-            throw new PermFailException("Invalid signature record: " + e.getMessage(), signatureRecord, e);
+            throw new PermFailException("Invalid signature record.", signatureRecord, e);
         }
 
         return true;
@@ -410,16 +411,20 @@ public class ArcVerifier extends DKIMVerifier
             try {
                 publicKey = key.getPublicKey();
             } catch (IllegalStateException e) {
-                throw new PermFailException("Invalid Public Key: " + e.getMessage(), sign, e);
+                throw new PermFailException("Invalid Public Key.", sign, e);
             }
             signature.initVerify(publicKey);
 
             signatureCheck(h, sign, headers, signature, DKIMCommon.AMS_HEADER);
 
             if (!signature.verify(decoded))
-                throw new PermFailException("Header signature does not verify", sign);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException e) {
-            throw new PermFailException(e.getMessage(), sign, e);
+                throw new PermFailException("Header signature does not verify.", sign);
+        } catch (InvalidKeyException e) {
+            throw new PermFailException("Invalid key.", sign, e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new PermFailException("Unknown algorithm.", sign, e);
+        } catch (SignatureException e) {
+            throw new PermFailException("Signature error.", sign, e);
         }
     }
 

@@ -1,14 +1,14 @@
-ARC-Seal:  a=rsa-sha256;
- b=FtzHHt+CXlEY8YCMZxsByEYPPqAAGifr0b73Zsp/VngtObn5R0JRoXpM/Y4qJi1OHbCZkMOVsmh8MG3GyNAkF9sCs88RBn5gWKfikCXyrGpa3e+QzHfg5O8ev8kvKkeIddnIh0VeJGxP+9wmr2Ex5gXxphBai8pwLv61OjHsWD8ICx7lMIzj1sn1DxcOB5CnSKTR04U9To1T295tgU2PGYGaczkdGsR020sTSk1cutskTLlW4GyAQeE1Nmds57yUpGeOdHMHwvAzWPVzspO4UcSSmgZHL8EymuUx6loojI495lWz1H3Q+kD44H7RsKLJb7WKQGOvbTwrxQzkreArbw==;
- cv=pass; s=sophos100; d=g-suite1.emailblr1.com; i=3;
+ARC-Seal:  i=3; a=rsa-sha256;
+ b=cMAuVWHSbw6q3mez+uOwLZJZP3WeY2rY+/EXqVY0ZICMoXYea4Bu1aV58TRKhTP64GGmmUQxdKne3mpNfKiIjw5qt0TEIgCtWbAVLVo7NYJba3X4uhfy3tF9Q1WTLA4LhhLow9np1PkY9Qwwkfjl/VTXAtVkdM+rHQL45AGolWwPDfsQd5uzwk1tCK6YQz6IiJ4N3zbbnNXJ7Mnui3Bl4Xwwic6CIM4arL1Hlqug+cIY1Cq3GSSKrT1ObuYtzJQSWzpkeM28w38N1IH+ReW92JgXyl+4X/yshim94tzZCgiw6tpTQ6uDqIJi28yLUUa1ekKjwjFpZbjDvwaDoAJh3A==;
+ cv=pass; s=sophos100; d=g-suite1.emailblr1.com;
 ARC-Authentication-Results: i=3; mx.g-suite1.emailblr1.com; dkim=pass
  header.i=@gmail.com header.s=20230601 header.b="QzZwwS/+"; spf=pass
  (google.com: domain of rohullahrahmanee@gmail.com designates 209.85.216.41
  as permitted sender) smtp.mailfrom=rohullahrahmanee@gmail.com;
-ARC-Message-Signature:  a=rsa-sha256; q=dns/txt;
- b=chYPqemzG38sKY7aIL9/kMvpJFWncOj2KI+LDd6Rwqs4u5GVYeGBPe3+xxmxFJXGJoo+3QYlvcvddpjiRKkhX9BXqW1l7lSbT54l9Qg6HdDHiz8g009hNzcuDWlH6y2tQewflDZJ7uUqeLVPM/xe7BaG8RdhKlbvPDTMwVZ8sZH0qnFKxI1Xj1aWEonNmjfVLPv0R/DIMkZ7WFnVVX1/ECNoIgPVVs72m+/PnTLwnXaobZAQobMulEzXH2rsHUjeprPVWNkRWqf2uea7vkkbkL8UZo3nzMngbo/m/j5lSEiLffBRAJIQf63kA/5qftI6dFi6RbtZI71mYAuAJCpalw==;
+ARC-Message-Signature:  i=3; a=rsa-sha256; q=dns/txt;
+ b=Ap+/TGkW/jh9w36EjZTB9mtJzRedoMclCeflVFqYK9S4zRfHKHn5nikjKQnqNgZBrvf2DHxWVr4oAYKs8zBBfukrRh3kdtYH+e5RTF+zYR3u0xy4/waxeDaR0UeAqL0WEvWk2u+LiVsb7Ma0wioiagM0wSwVLjAJIc9Ojx1Y9sppJEWw0FXES4MkmIiGV0H1e8qiSM+97rONCDG+pMkMH3aHBRROvSJlLoaM7huZKjznWaVhlRHWAQIBOPSSj2o0b3d1K60TGK/kB2R1wcf/FfvAftBBotMr8F06zTSs92D54GOvDJIX4d1GOWyxOWVI7qBwwY8P5IG3Hq6cazXwwQ==;
  c=relaxed/relaxed; s=sophos100; d=g-suite1.emailblr1.com;
- bh=8r15karoMut1kkFIYPyQzHGjIeNdMCHnIscmzWo9o+0=; h=date:from:subject; i=3;
+ bh=8r15karoMut1kkFIYPyQzHGjIeNdMCHnIscmzWo9o+0=; h=date:from:subject;
 Delivered-To: user2@g-suite1.emailblr1.com
 Received: by 2002:a05:7022:458e:b0:11b:cdcc:e702 with SMTP id cf14csp285986dlb;
         Wed, 19 Nov 2025 07:58:10 -0800 (PST)
